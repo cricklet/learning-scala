@@ -66,7 +66,10 @@ println()
 
   var arr = Array("apple", "orange", "banana")
   var banana = "banana"
+
+  // A function literal (or anonymous function)
   var isBanana = (v: String) => v == "banana"
+
   println("Index of %s in %s is %d.".format(
     banana,
     arr.mkString("[", ", ", "]"),
