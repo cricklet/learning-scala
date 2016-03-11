@@ -31,8 +31,22 @@ object Maths {
   def formatFactorial(n: Int): String = {
     "Factorial of %d is %d.".format(n, factorial(n))
   }
+
+  def fib(n: Int): Int = {
+    def calc(v0: Int, v1: Int, steps: Int): Int =
+      if (steps == n) v0
+      else calc(v1, v0 + v1, steps + 1)
+
+    calc(0, 1, 1)
+  }
 }
 
 
 println(Maths.formatAbs(-4))
 println(Maths.formatFactorial(4))
+
+println(Maths.fib(1))
+println(Maths.fib(2))
+println(Maths.fib(3))
+println(Maths.fib(4))
+println(Maths.fib(5))
