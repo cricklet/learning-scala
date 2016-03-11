@@ -73,3 +73,29 @@ println()
     index(arr, isBanana)
   ))
 }
+
+{
+  def isSorted[A](arr: Array[A], ordered: (A, A) => Boolean) = {
+    def loop(i: Int): Boolean =
+      if (i >= arr.length) true
+      else if (ordered(arr(i-1), arr(i))) loop(i + 1)
+      else false
+
+    loop(1)
+  }
+
+  var arr = Array(0, 1, 2, 3)
+  var orderedInts = (x: Int, y: Int) => x < y
+
+  println("%s is sorted: %b".format(
+    arr.mkString("[", ", ", "]"),
+    isSorted(arr, orderedInts)
+  ))
+
+  arr = Array(0, 1, 3, 2)
+
+  println("%s is sorted: %b".format(
+    arr.mkString("[", ", ", "]"),
+    isSorted(arr, orderedInts)
+  ))
+}
