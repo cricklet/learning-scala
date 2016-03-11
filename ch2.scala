@@ -4,10 +4,6 @@ object Maths {
     if (x < 0) -x
     else x
 
-  def formatAbs(x: Int) = {
-    "Abs of %d is %d!".format(x, abs(x))
-  }
-
   def factorial(n: Int): Int = {
 
     // Tail call elimination: when 'self-recursion' is compiled into the same sort
@@ -28,25 +24,24 @@ object Maths {
     go(n, 1)
   }
 
-  def formatFactorial(n: Int): String = {
-    "Factorial of %d is %d.".format(n, factorial(n))
-  }
-
   def fib(n: Int): Int = {
     def calc(v0: Int, v1: Int, steps: Int): Int =
       if (steps == n) v0
       else calc(v1, v0 + v1, steps + 1)
 
-    calc(0, 1, 1)
+    calc(0, 1, 0)
   }
+
 }
 
+def formatResult (name: String, n: Int, f: Int => Int): String =
+  "The %s of %d is %d.".format(name, n, f(n))
 
-println(Maths.formatAbs(-4))
-println(Maths.formatFactorial(4))
+println(formatResult("abs", -4, Maths.abs))
+println(formatResult("fact", 4, Maths.factorial))
 
-println(Maths.fib(1))
-println(Maths.fib(2))
-println(Maths.fib(3))
-println(Maths.fib(4))
-println(Maths.fib(5))
+print("Fibonacci: ")
+for (i <- 0 until 10) {
+  print(Maths.fib(i) + " ")
+}
+println()
