@@ -45,3 +45,29 @@ for (i <- 0 until 10) {
   print(Maths.fib(i) + " ")
 }
 println()
+
+// A function that works on *any* type is a polymorphic (or generic) function.
+
+// This is different from polymorphism in OOP, where the term implies
+// sub-typing or inheritance.
+
+// By convention, type parameter declarations are named A, B, C, etc.
+
+def index[A](arr: Array[A], f: A => Boolean): Int ={
+  @annotation.tailrec
+  def loop(i: Int): Int =
+    if (i >= arr.length) -1
+    else if (f(arr(i))) i
+    else loop(i + 1)
+
+  loop(0)
+}
+
+var arr = Array("apple", "orange", "banana")
+var banana = "banana"
+var isBanana = (v: String) => v == "banana"
+println("Index of %s in %s is %d.".format(
+  banana,
+  arr.mkString("[", ", ", "]"),
+  index(arr, isBanana)
+))
