@@ -113,3 +113,25 @@ println()
   println("%d < %d = %s".format(3, 4, lessThan1(3, 4)))
   println("%d < %d = %s".format(3, 4, lessThan2(3, 4)))
 }
+
+{
+  def partial [A, B, C] (a: A, f: (A, B) => C): B => C =
+    (b: B) => f(a, b)
+
+  val add3 = partial(3, (a: Int, b: Int) => a + b)
+  println("add3(%d) = %d".format(4, add3(4)))
+
+  // It's finally time for some classic currying.
+  def curry [A, B, C] (f: (A, B) => C): A => (B => C) =
+    (a: A) => ((b: B) => f(a, b))
+
+  val add4 = curry((a: Int, b: Int) => a + b)(4)
+  println("add4(%d) = %d".format(4, add4(4)))
+
+  // And some uncurrying.
+  def uncurry [A, B, C] (f: (A) => (B => C)): (A, B) => C =
+    (a: A, b: B) => f(a)(b)
+
+  val add = uncurry(curry((a: Int, b: Int) => a + b))
+  println("add(%d, %d) = %d".format(3, 4, add(3, 4)))
+}
