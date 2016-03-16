@@ -135,3 +135,9 @@ println()
   val add = uncurry(curry((a: Int, b: Int) => a + b))
   println("add(%d, %d) = %d".format(3, 4, add(3, 4)))
 }
+
+{
+  // Composition is easy to figure out given the type signature.
+  def compose [A, B, C] (f: B => C, g: A => B): A => C =
+    (a: A) => f(g(a))
+}
