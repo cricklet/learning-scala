@@ -86,6 +86,32 @@ object List {
     case 0 => Nil
     case n => Cons(a, fill(n - 1, a))
   }
+
+  def apply [A] (arr: A*): List[A] =
+    if (arr.isEmpty) Nil
+    else Cons(arr.head, apply(arr.tail:_*))
+
+  def head [A] (l: List[A]): A = l match {
+    case Nil => throw new Exception("Uh oh")
+    case Cons(x, _) => x
+  }
+
+  def tail [A] (l: List[A]): List[A] = l match {
+    case Nil => throw new Exception("Uh oh")
+    case Cons(_, x) => x
+  }
+
+  def isEmpty [A] (l: List[A]): Boolean = l match {
+    case Nil => true
+    case _ => false
+  }
 }
 
-List.fill(3, 1)
+println("Fill %d, %d: %s".format(3, 1, List.fill(3, 1)))
+println("List constructor: %s".format(List(3, 2, 1)))
+
+val list = List(3, 2, 1)
+println("Head of %s: %s".format(list, List.head(list)))
+println("Tail of %s: %s".format(list, List.tail(list)))
+println("IsEmpty %s: %s".format(list, List.isEmpty(list)))
+println("IsEmpty %s: %s".format(Nil, List.isEmpty(Nil)))
