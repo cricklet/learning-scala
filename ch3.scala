@@ -29,6 +29,41 @@ val animalList: List[Animal] = Cons(new Dog(), Nil)
 
   val list = Cons(3, Cons(0, Cons(2, Nil)))
   println("Sum of %s is %d".format(list, sum(list)))
+
+  // Pattern matching can also be used outside functions
+  3 match {
+    case 0 => "zero"
+    case 1 => "one"
+    case _ => "other"
+  }
+
+  val any: Any = "Banana"
+  any match {
+    case x: Int => "int"
+    case y: String => "string"
+    case _ => "other"
+  }
+
+  // Case classes (which Cons is!) can be used to match
+  case class Person(name: String)
+
+  def barakTest(p: Person): String = p match {
+    case Person("Barak") => "wooo"
+    case _ => "awww"
+  }
+
+  val p0 = Person("Kenrick")
+  println("Test %s: %s".format(p0, barakTest(p0)))
+
+  val p1 = Person("Barak")
+  println("Test %s: %s".format(p1, barakTest(p1)))
+
+  // This doesn't work!
+  //class Person(name: String)
+  //def barakTest(p: Person): String = p match {
+  //  case Person("Barak") => "wooo"
+  //  case _ => "awww"
+  //}
 }
 
 {
