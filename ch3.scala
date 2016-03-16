@@ -30,3 +30,17 @@ val animalList: List[Animal] = Cons(new Dog(), Nil)
   val list = Cons(3, Cons(0, Cons(2, Nil)))
   println("Sum of %s is %d".format(list, sum(list)))
 }
+
+{
+  // Another quick sidebar: variadic function syntax
+  // "ints: Int*" is a variable-length argument list like "*args" in python.
+  def sum (ints: Int*): Int =
+    if (ints.isEmpty) 0
+    else (ints.head + sum(ints.tail:_*))
+
+  // To unpack an array to pass into a function, use ":_*"
+  val arr = Array(1, 2, 3)
+  println("Sum of %s is %d".format(arr, sum(arr:_*)))
+
+  println("Sum of %d, %d, %d is %d".format(1, 2, 3, sum(1, 2, 3)))
+}
