@@ -102,3 +102,14 @@ println()
     isSorted(arr, orderedInts)
   ))
 }
+
+{
+  // A function literal is actually an object with an 'apply' method!
+  val lessThan1 = (a: Int, b: Int) => a < b
+  val lessThan2 = new Function2[Int, Int, Boolean] {
+    def apply(a: Int, b: Int) = a < b
+  }
+
+  println("%d < %d = %s".format(3, 4, lessThan1(3, 4)))
+  println("%d < %d = %s".format(3, 4, lessThan2(3, 4)))
+}
