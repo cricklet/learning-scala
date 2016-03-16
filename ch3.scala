@@ -23,9 +23,10 @@ val animalList: List[Animal] = Cons(new Dog(), Nil)
   // Quick sidebar: pattern matching!
   def sum (ints: List[Int]): Int = ints match {
     case Nil => 0
+    case Cons(0, xs) => sum(xs) // a silly example
     case Cons(x, xs) => x + sum(xs)
   }
 
-  val list = Cons(3, Cons(2, Nil))
+  val list = Cons(3, Cons(0, Cons(2, Nil)))
   println("Sum of %s is %d".format(list, sum(list)))
 }
