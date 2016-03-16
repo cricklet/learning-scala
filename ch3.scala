@@ -19,3 +19,13 @@ class Dog extends Animal
 val animalList: List[Animal] = Cons(new Dog(), Nil)
 // val dogList: List[Dog] = Cons(new Animal(), Nil) // The reverse is not true!
 
+{
+  // Quick sidebar: pattern matching!
+  def sum (ints: List[Int]): Int = ints match {
+    case Nil => 0
+    case Cons(x, xs) => x + sum(xs)
+  }
+
+  val list = Cons(3, Cons(2, Nil))
+  println("Sum of %s is %d".format(list, sum(list)))
+}
