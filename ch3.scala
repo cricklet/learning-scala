@@ -44,3 +44,13 @@ val animalList: List[Animal] = Cons(new Dog(), Nil)
 
   println("Sum of %d, %d, %d is %d".format(1, 2, 3, sum(1, 2, 3)))
 }
+
+// We can create a "companion object" for our datatype.
+object List {
+  def fill [A] (n: Int, a: A): List[A] = n match {
+    case 0 => Nil
+    case n => Cons(a, fill(n - 1, a))
+  }
+}
+
+List.fill(3, 1)
