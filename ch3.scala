@@ -263,9 +263,45 @@ println("IsEmpty %s: %s".format(Nil, List.isEmpty(Nil)))
       case Cons(x, xs) => foldLeft(xs, f(value, x))(f)
     }
 
+  // In the same way that we can think about foldRight as something like
+  //     Cons(1, Cons(2, Nil)) => f(1, f(2, v))
+  // We can think about foldLeft as something like
+  //     Cons(1, Cons(2, Nil)) => f(f(v, 1), 2)
+
   val list = List(1, 2, 3)
   println("Prod of %s is %s".format(
     list,
     foldLeft(list, 1)(_*_)
   ))
+
+  println("Reverse of %s is %s".format(
+    list,
+    foldLeft(list, Nil: List[Int])((v, x) => Cons(x, v))
+  ))
+
+  // Writing foldLeft in terms of foldRight... Uh...
+  // foldRight: Cons(1, Cons(2, Nil)) => f(1, f(2, v))
+  // foldLeft:  Cons(1, Cons(2, Nil)) => f(f(v, 1), 2)
+
+  // Cons(1, Cons(2, Nil)) => g(g(?, 1), 2)
+  // We want g(g(?, 1), 2) to resolve to f(1, f(2, v))
+
+  // First step could be simply reversing the arguments:
+  //   If g is: (a, b) => h(b, a)
+  //   Then g(g(?, 1), 2) resolves to h(2, h(1, ?))
+
+  // This now looks like a job for reverse!
+  // Wait but I don't have macros...
+  // I can't just run the through reverse(...) without evaluating it.
+
+  // Maybe I can do the reversing first?
+
+  def foldRight [L, V] (list: List[L], value: V)(f: (L, V) => V): V = {
+    val reversed = foldLeft(list, Nil: List[L])((v, x) => Cons(x, v))
+    foldLeft(reversed, value)((a, b) => f(b, a))
+  }
+
+  // Eek, let's see if this works! I think it does!
+  var newList = foldRight(List(1, 2, 3), Nil: List[Int])(Cons(_,_))
+  println("Let's try our new foldRight out: %s".format(newList))
 }
