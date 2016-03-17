@@ -253,3 +253,18 @@ println("IsEmpty %s: %s".format(Nil, List.isEmpty(Nil)))
 
   // _.head is the same as (xs => xs.head)
 }
+
+{
+  // Time to apply that tail recursion stuff learned in ch 2!
+  def foldLeft [L, V] (list: List[L], value: V)(f: (V, L) => V): V =
+    list match {
+      case Nil => value
+      case Cons(x, xs) => f(foldLeft(xs, value)(f), x)
+    }
+
+  val list = List(1, 2, 3)
+  println("Prod of %s is %s".format(
+    list,
+    foldLeft(list, 1)(_*_)
+  ))
+}
