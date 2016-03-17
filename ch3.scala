@@ -163,4 +163,20 @@ println("IsEmpty %s: %s".format(Nil, List.isEmpty(Nil)))
   var isPositive = (x: Int) => x >= 0
   var list3 = List(1, 2, -1, 3, 4)
   println("Dropwhile positive for %s: %s".format(list3, dropWhile(list3, isPositive)))
+
+  def append [A] (l1: List[A], l2: List[A]): List[A] = l1 match {
+    case Nil => l2
+    case Cons(x, xs) => Cons(x, append(xs, l2))
+  }
+
+  var list4 = List('a', 'b')
+  var list5 = List('c', 'd')
+  println("Appending %s and %s gives %s".format(list4, list5, append(list4, list5)))
+
+  def removeLast [A] (l: List[A]): List[A] = l match {
+    case Nil => Nil
+    case Cons(_, Nil) => Nil
+    case Cons(x, xs) => Cons(x, removeLast(xs))
+  }
+  println("Removing last from %s gives %s".format(list1, removeLast(list1)))
 }
