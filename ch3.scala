@@ -213,7 +213,7 @@ println("IsEmpty %s: %s".format(Nil, List.isEmpty(Nil)))
   def foldRight [A, B] (list: List[A], value: B)(f: (A, B) => B): B =
     list match {
       case Nil => value
-      case Cons(x, xs) => foldRight(xs, f(x, value))(f)
+      case Cons(x, xs) => f(x, foldRight(xs, value)(f))
     }
 
   def sum2(ints: List[Int]) =
@@ -227,6 +227,10 @@ println("IsEmpty %s: %s".format(Nil, List.isEmpty(Nil)))
 
   val flts = List(1.0, 1.5, 2.0)
   println("The prod of %s is %s".format(flts, prod2(flts)))
+
+  // Interestingly, our List(...) constructor could be written using a fold.
+  var newList = foldRight(List(1, 2, 3), Nil: List[Int])(Cons(_,_))
+  println("We can easily copy lists using foldRight: %s".format(newList))
 }
 
 {
