@@ -292,7 +292,7 @@ println("IsEmpty %s: %s".format(Nil, List.isEmpty(Nil)))
 
   // This now looks like a job for reverse!
   // Wait but I don't have macros...
-  // I can't just run the through reverse(...) without evaluating it.
+  // I can't just run the expressions through reverse(...) without evaluating them.
 
   // Maybe I can do the reversing first?
 
