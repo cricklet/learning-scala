@@ -198,3 +198,43 @@ println("IsEmpty %s: %s".format(Nil, List.isEmpty(Nil)))
   ))
 
 }
+
+{
+  // Let's talk about higher order functions. Though-- riding on the train and
+  // reviewing foldr and foldl might be a bad idea...
+
+  // As a review, here's the 'sum' function written in Ch 1.
+  def sum(ints: List[Int]): Int = ints match {
+    case Nil => 0
+    case Cons(x, xs) => x + sum(xs)
+  }
+
+  // Let's generalize it to foldRight
+  def foldRight [A, B] (list: List[A], value: B)(f: (A, B) => B): B =
+    list match {
+      case Nil => value
+      case Cons(x, xs) => foldRight(xs, f(x, value))(f)
+    }
+
+  def sum2(ints: List[Int]) =
+    foldRight(ints, 0)((x, y) => x + y)
+
+  val ints = List(1,2,3)
+  println("The sum of %s is %d".format(ints, sum2(ints)))
+
+  def prod2(flts: List[Double]) =
+    foldRight(flts, 1.0)(_*_)
+
+  val flts = List(1.0, 1.5, 2.0)
+  println("The prod of %s is %s".format(flts, prod2(flts)))
+}
+
+{
+  // Quick sidebar: underscore notation for anonymous functions
+
+  // _*_ is the same as (x, y) => x * y
+  val mult: (Int, Int) => Int = _*_
+  println("%s(%s, %s) is %s".format(mult, 2, 3, mult(2, 3)))
+
+  // _.head is the same as (xs => xs.head)
+}
