@@ -249,7 +249,7 @@ println("IsEmpty %s: %s".format(Nil, List.isEmpty(Nil)))
 
   // _*_ is the same as (x, y) => x * y
   val mult: (Int, Int) => Int = _*_
-  println("%s(%s, %s) is %s".format(mult, 2, 3, mult(2, 3)))
+  println("mult(%s, %s) is %s".format(2, 3, mult(2, 3)))
 
   // _.head is the same as (xs => xs.head)
 }
