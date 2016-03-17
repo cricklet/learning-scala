@@ -256,10 +256,11 @@ println("IsEmpty %s: %s".format(Nil, List.isEmpty(Nil)))
 
 {
   // Time to apply that tail recursion stuff learned in ch 2!
+  @annotation.tailrec
   def foldLeft [L, V] (list: List[L], value: V)(f: (V, L) => V): V =
     list match {
       case Nil => value
-      case Cons(x, xs) => f(foldLeft(xs, value)(f), x)
+      case Cons(x, xs) => foldLeft(xs, f(value, x))(f)
     }
 
   val list = List(1, 2, 3)
