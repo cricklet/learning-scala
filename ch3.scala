@@ -125,3 +125,42 @@ println("Head of %s: %s".format(list, List.head(list)))
 println("Tail of %s: %s".format(list, List.tail(list)))
 println("IsEmpty %s: %s".format(list, List.isEmpty(list)))
 println("IsEmpty %s: %s".format(Nil, List.isEmpty(Nil)))
+
+{
+  // In general, immutable data structures use data sharing.
+  // In this example, list1 shares list0's data and adds a value to it.
+  val list0 = List(1, 2, 3)
+  val list1 = Cons(0, list0)
+
+  // Here, we replace the head of a list
+  def setHead [A] (l: List[A], newHead: A): List[A] = {
+    Cons(newHead, List.tail(l))
+  }
+  val list2 = setHead(list1, 5)
+
+  println(list0)
+  println(list1)
+  println(list2)
+
+  // Here, we drop some elements from a list
+  def drop [A] (l: List[A], n: Int): List[A] = n match {
+    case 0 => l
+    case n => l match {
+      case Nil => Nil
+      case _ => drop(List.tail(l), n - 1)
+    }
+  }
+
+  println("Dropping the first %d elements of %s: %s".format(2, list1, drop(list1, 2)))
+  println("Dropping the first %d elements of %s: %s".format(10, list1, drop(list1, 10)))
+
+  def dropWhile [A] (l: List[A], shouldDrop: A => Boolean) : List[A] = {
+    if (List.isEmpty(l)) Nil
+    else if (shouldDrop(List.head(l))) dropWhile(List.tail(l), shouldDrop)
+    else l
+  }
+
+  var isPositive = (x: Int) => x >= 0
+  var list3 = List(1, 2, -1, 3, 4)
+  println("Dropwhile positive for %s: %s".format(list3, dropWhile(list3, isPositive)))
+}
