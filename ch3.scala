@@ -179,4 +179,22 @@ println("IsEmpty %s: %s".format(Nil, List.isEmpty(Nil)))
     case Cons(x, xs) => Cons(x, removeLast(xs))
   }
   println("Removing last from %s gives %s".format(list1, removeLast(list1)))
+
+  // Let's do some basic type inference by using a curried dropWhile.
+
+  // By the time dropWhileInferred(list) is run, the resulting function
+  // is typed with 'A = Int'. Thus, Scala can guess that 'shouldDrop'
+  // has type 'Int => Boolean'.
+
+  // Note the syntax: you simply have to break up the arguments into
+  // multiple argument lists! The internals of the function are identical.
+  def dropWhileInferred [A] (l: List[A])(shouldDrop: A => Boolean) : List[A] = l match {
+    case Cons(x, xs) if shouldDrop(x) => dropWhile(xs, shouldDrop)
+    case _ => l
+  }
+
+  println("Dropwhile positive (w/ inferred types) for %s: %s".format(
+    list3, dropWhileInferred(list3)(x => x >= 0)
+  ))
+
 }
