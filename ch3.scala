@@ -231,6 +231,17 @@ println("IsEmpty %s: %s".format(Nil, List.isEmpty(Nil)))
   // Interestingly, our List(...) constructor could be written using a fold.
   var newList = foldRight(List(1, 2, 3), Nil: List[Int])(Cons(_,_))
   println("We can easily copy lists using foldRight: %s".format(newList))
+
+  // One way to think about this is that it transforms a list:
+  //    Cons(1, Cons(2, Cons(3, Nil)))
+  // By replacing Cons with 'f' and Nil with 'value'
+  //       f(1,    f(2,    f(3, value)))
+
+  def length [A] (list: List[A]): Int =
+    foldRight(list, 0)((_, value) => value + 1)
+
+  val list = List(1, 2, 3, 4)
+  println("The length of %s is %s".format(list, length(list)))
 }
 
 {
