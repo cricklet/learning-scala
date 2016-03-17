@@ -155,10 +155,9 @@ println("IsEmpty %s: %s".format(Nil, List.isEmpty(Nil)))
   println("Dropping the first %d elements of %s: %s".format(10, list1, drop(list1, 10)))
 
   def dropWhile [A] (l: List[A], shouldDrop: A => Boolean) : List[A] = l match {
-    case Nil => Nil
-    case Cons(x, xs) =>
-      if (shouldDrop(x)) dropWhile(xs, shouldDrop)
-      else Cons(x, xs)
+    // You can include 'if' statements within a 'case'!
+    case Cons(x, xs) if shouldDrop(x) => dropWhile(xs, shouldDrop)
+    case _ => l
   }
 
   var isPositive = (x: Int) => x >= 0
