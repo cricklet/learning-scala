@@ -437,3 +437,16 @@
   println("%s has subsequence %s => %s".format(sup, sub, hasSubsequence(sup, sub)))
   println("%s has subsequence %s => %s".format(sub, sup, hasSubsequence(sub, sup)))
 }
+
+{
+  // Algebraic data-types!
+  // ADTs are a data-types with multiple data constructors.
+  // Each data type is the union/sum of it's data constructors.
+  // Each data constructor is the product of it's arguments.
+
+  // Pairs & tuples are also algebraic data types.
+  val p0 = ("George", 1)
+  val p1 = Tuple2[String, Int]("George", 1)
+  println("%s == %s".format(p0, p1))
+
+}
