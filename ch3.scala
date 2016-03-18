@@ -412,11 +412,8 @@
 
   def isStart [A] (list: List[A], start: List[A]): Boolean = (list, start) match {
     case (_, Nil) => true
-    case (Nil, _) => false
-    case (l :: ls, s :: ss) => {
-      if (l == s) isStart(ls, ss)
-      else false
-    }
+    case (l :: ls, s :: ss) if l == s => isStart(ls, ss)
+    case _ => false
   }
 
   val l0 = List(1, 2, 3, 4)
