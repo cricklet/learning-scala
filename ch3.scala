@@ -409,4 +409,32 @@
 {
   println("Scala's default list implementation: %s".format(List(1, 2, 3)))
   println("Cons is actually '::': %s".format(1 :: 2 :: 3 :: Nil))
+
+  def isStart [A] (list: List[A], start: List[A]): Boolean = (list, start) match {
+    case (_, Nil) => true
+    case (Nil, _) => false
+    case (l :: ls, s :: ss) => {
+      if (l == s) isStart(ls, ss)
+      else false
+    }
+  }
+
+  val l0 = List(1, 2, 3, 4)
+  val l1 = List(1, 2)
+  val l2 = List(2, 3)
+  println("%s has start %s => %s".format(l0, l1, isStart(l0, l1)))
+  println("%s has start %s => %s".format(l0, l2, isStart(l0, l2)))
+  println("%s has start %s => %s".format(l1, l0, isStart(l1, l0)))
+
+  def hasSubsequence[A](list: List[A], sub: List[A]): Boolean = {
+    if (list.isEmpty) false
+    else if (isStart(list, sub)) true
+    else hasSubsequence(list.tail, sub)
+  }
+
+  val sup = List(1,2,3,4,5,6)
+  val sub = List(3,4)
+
+  println("%s has subsequence %s => %s".format(sup, sub, hasSubsequence(sup, sub)))
+  println("%s has subsequence %s => %s".format(sub, sup, hasSubsequence(sub, sup)))
 }
