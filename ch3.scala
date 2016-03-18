@@ -325,9 +325,7 @@ println("IsEmpty %s: %s".format(Nil, List.isEmpty(Nil)))
   //                         f(2,    f(3, Nil))
   //         f(1,            f(2,    f(3, Nil)))
   def flatten [A] (ll: List[List[A]]): List[A] = {
-    foldRight(ll, Nil: List[A])(
-      (l: List[A], result: List[A]) => append(l: List[A], result: List[A])
-    )
+    foldRight(ll, Nil: List[A])(append)
   }
 
   val ll = List(List(1,2), List(3,4))
