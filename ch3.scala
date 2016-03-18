@@ -410,6 +410,7 @@
   println("Scala's default list implementation: %s".format(List(1, 2, 3)))
   println("Cons is actually '::': %s".format(1 :: 2 :: 3 :: Nil))
 
+  @annotation.tailrec
   def isStart [A] (list: List[A], start: List[A]): Boolean = (list, start) match {
     case (_, Nil) => true
     case (l :: ls, s :: ss) if l == s => isStart(ls, ss)
@@ -423,6 +424,7 @@
   println("%s has start %s => %s".format(l0, l2, isStart(l0, l2)))
   println("%s has start %s => %s".format(l1, l0, isStart(l1, l0)))
 
+  @annotation.tailrec
   def hasSubsequence[A](list: List[A], sub: List[A]): Boolean = list match {
     case Nil => false
     case _ if isStart(list, sub) => true
