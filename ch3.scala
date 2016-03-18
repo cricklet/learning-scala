@@ -423,10 +423,10 @@
   println("%s has start %s => %s".format(l0, l2, isStart(l0, l2)))
   println("%s has start %s => %s".format(l1, l0, isStart(l1, l0)))
 
-  def hasSubsequence[A](list: List[A], sub: List[A]): Boolean = {
-    if (list.isEmpty) false
-    else if (isStart(list, sub)) true
-    else hasSubsequence(list.tail, sub)
+  def hasSubsequence[A](list: List[A], sub: List[A]): Boolean = list match {
+    case Nil => false
+    case _ if isStart(list, sub) => true
+    case _ => hasSubsequence(list.tail, sub)
   }
 
   val sup = List(1,2,3,4,5,6)
