@@ -449,4 +449,15 @@
   val p1 = Tuple2[String, Int]("George", 1)
   println("%s == %s".format(p0, p1))
 
+  // Let's create a tree.
+  sealed trait Tree[+A]
+  case class Leaf[A](value: A) extends Tree[A]
+  case class Branch[A](left: Tree[A], right: Tree[A]) extends Tree[A]
+
+  val t0 = Branch(
+    Branch(Leaf(1), Leaf(2)),
+    Branch(Leaf(3), Leaf(4))
+  )
+
+  println("Here's a simple tree: %s".format(t0))
 }
