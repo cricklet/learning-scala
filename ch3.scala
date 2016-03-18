@@ -346,4 +346,17 @@ println("IsEmpty %s: %s".format(Nil, List.isEmpty(Nil)))
   }
 
   println("map(%s, _+3) is %s".format(list6, map(list6)(_+3)))
+
+  // Filter
+  def filter [A] (l: List[A])(keep: A => Boolean): List[A] = {
+    foldRight(l, Nil: List[A])(
+      (v, result) =>
+      if (keep(v)) Cons(v, result)
+      else result
+    )
+  }
+
+  val list7 = List(1, 2, 3, 4, 5, 6)
+  val isEven = (x: Int) => x % 2 == 0
+  println("Filtering  %s for even values gives %s".format(list7, filter(list7)(isEven)))
 }
