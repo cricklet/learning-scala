@@ -339,4 +339,11 @@ println("IsEmpty %s: %s".format(Nil, List.isEmpty(Nil)))
 
   val list6 = List(1, 2, 3)
   println("mapPlus(%s, %d) is %s".format(list6, 10, mapPlus(list6, 10)))
+
+  // Actual map!
+  def map [A, B] (l: List[A])(f: A => B): List[B] = {
+    foldRight(l, Nil: List[B])((v, result) => Cons(f(v), result))
+  }
+
+  println("map(%s, _+3) is %s".format(list6, map(list6)(_+3)))
 }
