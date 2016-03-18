@@ -304,4 +304,13 @@ println("IsEmpty %s: %s".format(Nil, List.isEmpty(Nil)))
   // Eek, let's see if this works! I think it does!
   var newList = foldRight(List(1, 2, 3), Nil: List[Int])(Cons(_,_))
   println("Let's try our new foldRight out: %s".format(newList))
+
+  // Alright let's do append with foldRight
+  def append [A] (l1: List[A], l2: List[A]): List[A] = {
+    foldRight(l1, l2)((x, l) => Cons(x, l))
+  }
+
+  var list4 = List('a', 'b')
+  var list5 = List('c', 'd')
+  println("Appending (w/ fold) %s and %s gives %s".format(list4, list5, append(list4, list5)))
 }
