@@ -359,4 +359,15 @@ println("IsEmpty %s: %s".format(Nil, List.isEmpty(Nil)))
   val list7 = List(1, 2, 3, 4, 5, 6)
   val isEven = (x: Int) => x % 2 == 0
   println("Filtering  %s for even values gives %s".format(list7, filter(list7)(isEven)))
+
+  // Weird-ass flatMap
+  def flatMap [A, B] (l: List[A])(f: A => List[B]): List[B] = {
+    val nested: List[List[B]] = map(l)(f)
+    flatten(nested)
+  }
+
+  println("flatMap(%s)(x => List(x, x+1, x+2)) gives %s".format(
+    list6,
+    flatMap(list6)(x => List(x, x+1, x+2))
+  ))
 }
