@@ -330,4 +330,13 @@ println("IsEmpty %s: %s".format(Nil, List.isEmpty(Nil)))
 
   val ll = List(List(1,2), List(3,4))
   println("Flattening %s gives %s".format(ll, flatten(ll)))
+
+  // Okay, now it's time to start mapping.
+  // First-- let's transform a list by +1ing each of it's values.
+  def mapPlus (l: List[Int], add: Int): List[Int] = {
+    foldRight(l, Nil: List[Int])((v, result) => Cons(v + add, result))
+  }
+
+  val list6 = List(1, 2, 3)
+  println("mapPlus(%s, %d) is %s".format(list6, 10, mapPlus(list6, 10)))
 }
