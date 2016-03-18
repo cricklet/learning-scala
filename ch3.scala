@@ -313,4 +313,24 @@ println("IsEmpty %s: %s".format(Nil, List.isEmpty(Nil)))
   var list4 = List('a', 'b')
   var list5 = List('c', 'd')
   println("Appending (w/ fold) %s and %s gives %s".format(list4, list5, append(list4, list5)))
+
+  // Now, let's flatten a list of lists.
+  // First, we start with: (I'm using 'cons' for the inner lists)
+  //   Cons(cons(1, Nil), Cons(cons(2, cons(3, Nil)), Nil))
+
+  // foldRight turns this into: g(cons(1, Nil), g(cons(2, cons(3, Nil)), ?))
+
+  // What if g itself is a fold?
+  //    g(cons(1, Nil), g(cons(2, cons(3, Nil)), ?))
+  //                         f(2,    f(3, Nil))
+  //         f(1,            f(2,    f(3, Nil)))
+  def flatten [A] (ll: List[List[A]]): List[A] = {
+    foldRight(ll, Nil: List[A])(
+      (l: List[A], result: List[A])
+        => foldRight(l: List[A], result: List[A])((x: A, inner: List[A]) => Cons(x, inner))
+    )
+  }
+
+  val ll = List(List(1,2), List(3,4))
+  println("Flattening %s gives %s".format(ll, flatten(ll)))
 }
