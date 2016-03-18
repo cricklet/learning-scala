@@ -460,4 +460,18 @@
   )
 
   println("Here's a simple tree: %s".format(t0))
+
+  def numNodes [A] (node: Tree[A]): Int = node match {
+    case Leaf(_) => 1
+    case Branch(l, r) => 1 + numNodes(l) + numNodes(r)
+  }
+
+  println("numNodes of that simple tree: %s".format(numNodes(t0)))
+
+  def maxValue (node: Tree[Int]): Int = node match {
+    case Leaf(v) => v
+    case Branch(l, r) => maxValue(l) max maxValue(r)
+  }
+
+  println("maxValue of that simple tree: %s".format(maxValue(t0)))
 }
