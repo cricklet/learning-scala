@@ -383,4 +383,24 @@ println("IsEmpty %s: %s".format(Nil, List.isEmpty(Nil)))
   }
 
   println("Filtering (weird) %s for even values gives %s".format(list7, filterWeird(list7)(isEven)))
+
+  // Construct new list by adding elements from two lists
+  def zipAdd (l0: List[Int], l1: List[Int]): List[Int] = (l0, l1) match {
+    case (Nil, _) | (_, Nil) => Nil
+    case (Cons(x0, xs0), Cons(x1, xs1)) => Cons(x0 + x1, zipAdd(xs0, xs1))
+  }
+
+  println("zipAdd(List(1,2,3), List(10, 100, 200)) => %s".format(zipAdd(List(1,2,3), List(10, 100, 200))))
+
+  // Generalized zipWith
+  def zipWith [A, B, C] (l0: List[A], l1: List[B])(f: (A, B) => C): List[C] = (l0, l1) match {
+    case (Nil, _) | (_, Nil) => Nil
+    case (Cons(x0, xs0), Cons(x1, xs1)) => {
+      Cons(f(x0, x1), zipWith(xs0, xs1)(f))
+    }
+  }
+
+  val l0 = List[String]("str: %s", "int: %d")
+  val l1 = List[Any]("asdf", 1)
+  println("zipWith(...)(_.format(_)) => %s".format(zipWith(l0, l1)(_.format(_))))
 }
