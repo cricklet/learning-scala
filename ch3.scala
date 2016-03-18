@@ -474,4 +474,18 @@
   }
 
   println("maxValue of that simple tree: %s".format(maxValue(t0)))
+
+  val t1 = Branch(
+    Branch(Leaf(1), Branch(Leaf(2), Leaf(3))),
+    Branch(Leaf(4), Leaf(5))
+  )
+
+  println("Here's a more complex tree: %s".format(t1))
+
+  def depth [A] (node: Tree[A]): Int = node match {
+    case Leaf(v) => 1
+    case Branch(l, r) => 1 + (depth(l) max depth(r))
+  }
+
+  println("depth of the complex tree: %s".format(depth(t1)))
 }
