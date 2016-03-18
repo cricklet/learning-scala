@@ -488,4 +488,12 @@
   }
 
   println("depth of the complex tree: %s".format(depth(t1)))
+
+  def mapTree [A, B] (node: Tree[A])(f: A => B): Tree[B] = node match {
+    case Leaf(v) => Leaf(f(v))
+    case Branch(l, r) => Branch(mapTree(l)(f), mapTree(r)(f))
+  }
+
+  println("mapTree(%s, _+3) => %s".format(t0, mapTree(t0)(_+3)))
+
 }
