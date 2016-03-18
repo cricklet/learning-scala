@@ -456,7 +456,7 @@
 
   val t0 = Branch(
     Branch(Leaf(1), Leaf(2)),
-    Branch(Leaf(3), Leaf(4))
+    Leaf(3)
   )
 
   println("Here's a simple tree: %s".format(t0))
