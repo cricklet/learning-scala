@@ -405,3 +405,8 @@
     println("zipWith(...)(_.format(_)) => %s".format(zipWith(l0, l1)(_.format(_))))
   }
 }
+
+{
+  println("Scala's default list implementation: %s".format(List(1, 2, 3)))
+  println("Cons is actually '::': %s".format(1 :: 2 :: 3 :: Nil))
+}
