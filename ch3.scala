@@ -4,7 +4,9 @@ sealed trait List[+A]
 
 // Data constructors of List
 case object Nil extends List[Nothing]
-case class Cons[+A](head: A, tail: List[A]) extends List[A]
+case class Cons[+A](head: A, tail: List[A]) extends List[A] {
+  override def toString = "C(%s, %s)".format(head, tail)
+}
 
 // Let's construct some simple lists
 Cons(2, Nil)
