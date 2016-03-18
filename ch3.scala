@@ -372,4 +372,15 @@ println("IsEmpty %s: %s".format(Nil, List.isEmpty(Nil)))
     list6,
     flatMap(list6)(x => List(x, x+1, x+2))
   ))
+
+  // Weird-ass filter
+  def filterWeird [A] (l: List[A])(f: A => Boolean) = {
+    flatMap(l)(
+      v =>
+      if (f(v)) List(v)
+      else Nil
+    )
+  }
+
+  println("Filtering (weird) %s for even values gives %s".format(list7, filterWeird(list7)(isEven)))
 }
