@@ -65,10 +65,23 @@ sealed trait Option[+A] {
   }
 
   // "B >: A" means that A 'is a' B
+  // "default: => B" means that 'default' won't be evaluated until it's needed (laziness)
   def getOrElse [B >: A] (default: => B): B = this match {
     case Some(v) => v
     case None => default
   }
+
+  //def flatMap [B] (f: A => Option[B]): Option [B] = {
+  //  // this.map(f) returns Option[Option[B]] eeeek
+  //  this.map(f) getOrElse None
+  //}
+
+  def flatMap [B] (f: A => Option[B]): Option [B] = this match {
+    case Some(v) => f(v)
+    case None => None
+  }
+
+
 }
 case class Some[+A] (get: A) extends Option[A]
 case object None extends Option[Nothing]
