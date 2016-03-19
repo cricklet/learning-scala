@@ -1,3 +1,6 @@
+// Hide 'Option' and 'Either'
+import scala.{Option => _, Either => _, _}
+
 {
   // What's so bad about exceptions?
   // Well, if you're trying to do FP, they're not referentially transparent!
@@ -54,17 +57,15 @@
   println("Mean of an empty list: %s".format(mean2(List(), 0.0 / 0.0)))
 }
 
-{
-  // Instead, we can use 'Option' (which is like Haskell's "Maybe")
-  sealed trait Option[+A]
-  case class Some[+A] (get: A) extends Option[+A]
-  case object None extends Option[Nothing]
+// Instead, we can use 'Option' (which is like Haskell's "Maybe")
+sealed trait Option[+A]
+case class Some[+A] (get: A) extends Option[A]
+case object None extends Option[Nothing]
 
-  def mean (xs: Seq[Double]): Option[Double] =
-    if (xs.isEmpty) None
-    else Some(xs.sum / xs.length)
+def mean (xs: Seq[Double]): Option[Double] =
+  if (xs.isEmpty) None
+  else Some(xs.sum / xs.length)
 
-  println("Mean of an empty list: %s".format(mean(List())))
-  println("Mean of an non-empty list: %s".format(mean(List(1.0, 1.5))))
+println("Mean of an empty list: %s".format(mean(List())))
+println("Mean of an non-empty list: %s".format(mean(List(1.0, 1.5))))
 
-}
