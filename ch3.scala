@@ -496,4 +496,35 @@
 
   println("mapTree(%s, _+3) => %s".format(t0, mapTree(t0)(_+3)))
 
+  {
+    // Why is it okay to expose the data constructors of a datatype?
+    // i.e. doesn't that break encapsulation?
+    //      In OO, the implementation details of constructors should be private...
+
+    // In FP, however, we don't usually have delicate, internal state that
+    // we try to keep safe by hiding it.
+  }
+
+  // fold for trees!
+  def fold [A, B] (node: Tree[A])(f: A => B)(g: (B, B) => B): B = node match {
+    case Leaf(v) => f(v)
+    case Branch(l, r) =>
+      g(fold(r)(f)(g), fold(l)(f)(g))
+  }
+
+  def numNodesViaFold [A] (node: Tree[A]): Int =
+    fold(node)((v) => 1)(1 + _ + _)
+
+  println("numNodes of that simple tree: %s".format(numNodesViaFold(t0)))
+
+  def maxValueViaFold (node: Tree[Int]): Int =
+    fold(node)(v => v)(_ max _)
+
+  println("maxValue of that simple tree: %s".format(maxValueViaFold(t0)))
+
+  def depthViaFold [A] (node: Tree[A]): Int =
+    fold(node)(v => 1)((l, r) => (l max r) + 1)
+
+  println("depth of the complex tree: %s".format(depthViaFold(t1)))
+
 }
