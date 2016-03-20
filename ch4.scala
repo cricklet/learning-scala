@@ -254,10 +254,11 @@ println("Variance of an non-empty list: %s".format(variance(List(1.0, 1.5))))
   // Using sequence for this, though, is a little awkward. Let's write new helper:
   def traverse [A, B] (as: List[A])(f: A => Option[B]): Option[List[B]] = as match {
     case Nil => Some(Nil)
-    case x :: xs => (f(x), traverse(xs)(f)) match {
-      case (Some(l), Some(r)) => Some(l :: r)
-      case (_, _) => None
-    }
+    case x :: xs =>
+      for {
+        fx <- f(x)
+        txs <- traverse(xs)(f)
+      } yield fx :: txs
   }
 
   println("%s traversed as ints gives %s".format(list2, traverse(list2)(x => Try(x.toInt))))
