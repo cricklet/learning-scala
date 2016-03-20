@@ -206,16 +206,18 @@ println("Variance of an non-empty list: %s".format(variance(List(1.0, 1.5))))
   println("liftedAdd %s %s => %s".format(None, Some(2), liftedAdd(None, Some(2))))
 }
 {
+  // Sometimes, we want to take a list of options and turn it into an optional list.
   def sequence [A] (a: List[Option[A]]): Option[List[A]] = a match {
     case Nil => Some(Nil)
     case Some(v) :: xs => sequence(xs).map(v :: _)
-    case None :: xs => sequence(xs)
+    case None :: xs => None
   }
 
   val list0 = List(Some(0), None, Some(2), Some(3), None)
+  val list1 = List(Some(0), Some(1), Some(2))
   println("%s turns into %s when passed through sequence".format(list0, sequence(list0)))
-}
-{
+  println("%s turns into %s when passed through sequence".format(list1, sequence(list1)))
+
   // We can easiy turn exceptions into None through a 'Try' helper function.
   def Try [A] (a: => A): Option[A] =
     try Some(a)
