@@ -105,5 +105,22 @@ def mean (xs: Seq[Double]): Optn[Double] =
 println("Mean of an empty list: %s".format(mean(List())))
 println("Mean of an non-empty list: %s".format(mean(List(1.0, 1.5))))
 
-def variance (xs: Seq[Double]): Optn[Double] =
+// When transforming an 'Option,' you generally use 'map' or 'flatMap'.
+// Consider:
+//   val employee: Option[Employee] = getEmployee(...)
+
+// If we want to transform employee with a function that always suceeds:
+//   val department: Option[Department] = employee.map(_.department)
+
+// If we want to transform employee with a function that sometimes fails
+// (i.e. it returns an Option)
+//   val manager: Option[Manager] = employee.map(_.manager)
+
+def variance (xs: Seq[Double]): Optn[Double] = {
+  // If we could calculate the variance of 'xs' after computing the mean 'm'
+  // of 'xs' without calling *any* functions that could fail, then we could use
+  // '.map()'.
+
+  // Unfortunately, we need to call 'mean(...)' again. Thus, we need to use 'flatMap'.
   mean(xs).flatMap(m => mean(xs.map(x => math.pow(x - m, 2))))
+}
