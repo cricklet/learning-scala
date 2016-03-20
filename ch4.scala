@@ -251,11 +251,9 @@ println("Variance of an non-empty list: %s".format(variance(List(1.0, 1.5))))
   println("%s parsed as ints gives %s".format(list2, parseInt(list2)))
   println("%s parsed as ints gives %s".format(list3, parseInt(list3)))
 
-  // Using sequence for this, though, is a little awkward. Let's write
-  // new helper:
+  // Using sequence for this, though, is a little awkward. Let's write new helper:
   def traverse [A, B] (as: List[A])(f: A => Option[B]): Option[List[B]] = as match {
     case Nil => Some(Nil)
-    case None :: xs => None
     case x :: xs => (f(x), traverse(xs)(f)) match {
       case (Some(l), Some(r)) => Some(l :: r)
       case (_, _) => None
