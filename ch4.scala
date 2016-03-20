@@ -205,3 +205,13 @@ println("Variance of an non-empty list: %s".format(variance(List(1.0, 1.5))))
   println("liftedAdd %s %s => %s".format(Some(1), None, liftedAdd(Some(1), None)))
   println("liftedAdd %s %s => %s".format(None, Some(2), liftedAdd(None, Some(2))))
 }
+{
+  def sequence [A] (a: List[Option[A]]): Option[List[A]] = a match {
+    case Nil => Some(Nil)
+    case Some(v) :: xs => sequence(xs).map(v :: _)
+    case None :: xs => sequence(xs)
+  }
+
+  val list0 = List(Some(0), None, Some(2), Some(3), None)
+  println("%s turns into %s when passed through sequence".format(list0, sequence(list0)))
+}
