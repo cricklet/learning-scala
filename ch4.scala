@@ -263,3 +263,51 @@ println("Variance of an non-empty list: %s".format(variance(List(1.0, 1.5))))
   println("%s traversed as ints gives %s".format(list2, traverse(list2)(x => Try(x.toInt))))
   println("%s traversed as ints gives %s".format(list3, traverse(list3)(x => Try(x.toInt))))
 }
+
+{
+  // List comprehensions consist of a sequence of bindings like:
+  //    i <- List(range(0, 10))
+  //    x <- Some(2)")
+  // and an 'yield' expression to evaluate.
+
+  println("Let's make a simple list: %s".format(
+    for { i <- List.range(0, 10) } yield i
+  ))
+
+  println("Let's include only odd numbers: %s".format(
+    for {
+      i <- List.range(0, 10) if i % 2 == 1
+    } yield i
+  ))
+
+  val list0 = List(0, 1, 2)
+  val list1 = List("a", "b", "c")
+  println("Combining %s and %s with a list comprehension: %s".format(
+    list0,
+    list1,
+    for {
+      x <- list0
+      y <- list1
+    } yield (x, y)
+  ))
+
+  // We can use list comprehensions on options because options are sequences.
+  val s0 = Some(1)
+  val s1 = Some("a")
+  val n = None
+  println("Let's combine some options: %s, %s => %s".format(
+    s0, s1,
+    for {
+      x <- s0
+      y <- s1
+    } yield (x, y)
+  ))
+
+  println("If we use a None value: %s, %s => %s".format(
+    s0, n,
+    for {
+      x <- s0
+      y <- n
+    } yield (x, y)
+  ))
+}
