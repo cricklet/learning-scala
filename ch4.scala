@@ -124,3 +124,44 @@ def variance (xs: Seq[Double]): Optn[Double] = {
   // Unfortunately, we need to call 'mean(...)' again. Thus, we need to use 'flatMap'.
   mean(xs).flatMap(m => mean(xs.map(x => math.pow(x - m, 2))))
 }
+
+// Sometimes, we want to turn an undefined 'Option' into an exception. In this case,
+// we can simply do: option.getOrElse(throw new Exception("Uh oh"))
+
+// This should generally *only be done* if no reasonable program would ever catch
+// the exception.
+
+// This matches what the Practical Programmer says about exceptions:
+
+//   "We believe that exceptions should rarely be used as part of a
+//    program's normal flow; exceptions should be reserved for unexpected
+//    events. Assume that an uncaught exception will terminate your program
+//    and ask yourself, 'Will this code still run if I remove all the
+//    exception handlers?' If the answer is 'no,' then maybe exceptions are
+//    being used in nonexceptional circumstances."
+
+// In PP, they provide this example of a function that should throw an exception:
+//     public void openPasswd() throws FileNotFoundException {
+//        ipstream = new FileInputStream("/etc/passwd");
+//        ...
+//      }
+
+// And this example of a function that should not throw an exception except in
+// abnormal circumstances:
+//     public void openFile(String filename) throws FileNotFoundException {
+//       File f = new File(filename);
+//       if (!f.exists())
+//          return false; // error handling NOT exception throwing!
+//
+//       ipstream = new FileInputStream(f);
+//       return true;
+//     }
+
+// It seems to me that PP's second case could benifit from Scala's 'Option'.
+// After all, it's clear that 'openFile(...)' should ideally actually return the
+// file stream that was opened.
+//     def openFile(filename: String): Option[FileInputStream] = {
+//       val f: File = new File(filename)
+//       if (!f.exists()) None
+//       else Some(new FileInputStream(f))
+//     }
