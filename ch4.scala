@@ -196,4 +196,12 @@ println("Variance of an non-empty list: %s".format(variance(List(1.0, 1.5))))
       case (_, None) => None
       case (Some(a), Some(b)) => Some(f(a, b))
     }
+
+  val add = (x: Int, y: Int) => x + y
+  val liftedAdd = lift2(add)
+
+  println("add %s %s => %s".format(1, 2, add(1, 2)))
+  println("liftedAdd %s %s => %s".format(Some(1), Some(2), liftedAdd(Some(1), Some(2))))
+  println("liftedAdd %s %s => %s".format(Some(1), None, liftedAdd(Some(1), None)))
+  println("liftedAdd %s %s => %s".format(None, Some(2), liftedAdd(None, Some(2))))
 }
