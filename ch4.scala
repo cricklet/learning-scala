@@ -58,14 +58,14 @@
 // Let's call ours 'Optn' to avoid namespace collision.
 sealed trait Optn[+A] {
   def map [B] (f: A => B): Optn [B] = this match {
-    case Some(v) => Some(f(v))
+    case Sm(v) => Sm(f(v))
     case None => None
   }
 
   // "B >: A" means that A 'is a' B
   // "default: => B" means that 'default' won't be evaluated until it's needed (laziness)
   def getOrElse [B >: A] (default: => B): B = this match {
-    case Some(v) => v
+    case Sm(v) => v
     case None => default
   }
 
@@ -75,32 +75,32 @@ sealed trait Optn[+A] {
   //}
 
   def flatMap [B] (f: A => Optn[B]): Optn [B] = this match {
-    case Some(v) => f(v)
+    case Sm(v) => f(v)
     case None => None
   }
 
   // def orElse [B >: A] (default: => Optn[B]): Optn [B] =
-  //  map(a => Some(a)) getOrElse default
+  //  map(a => Sm(a)) getOrElse default
 
   def orElse [B >: A] (default: => Optn[B]): Optn [B] = this match {
     case None => default
-    case _ => this // Some(a) => Some(a)
+    case _ => this // Sm(a) => Sm(a)
   }
 
   // def filter (f: A => Boolean): Optn [A] =
-  //  flatMap(a => if (f(a)) Some(a) else None)
+  //  flatMap(a => if (f(a)) Sm(a) else None)
 
   def filter (f: A => Boolean): Optn [A] = this match {
-    case Some(v) if f(v) => Some(v)
+    case Sm(v) if f(v) => Sm(v)
     case _ => None
   }
 }
-case class Some[+A] (get: A) extends Optn[A]
+case class Sm[+A] (get: A) extends Optn[A]
 case object None extends Optn[Nothing]
 
 def mean (xs: Seq[Double]): Optn[Double] =
   if (xs.isEmpty) None
-  else Some(xs.sum / xs.length)
+  else Sm(xs.sum / xs.length)
 
 println("Mean of an empty list: %s".format(mean(List())))
 println("Mean of an non-empty list: %s".format(mean(List(1.0, 1.5))))
