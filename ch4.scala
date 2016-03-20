@@ -125,6 +125,9 @@ def variance (xs: Seq[Double]): Optn[Double] = {
   mean(xs).flatMap(m => mean(xs.map(x => math.pow(x - m, 2))))
 }
 
+println("Variance of an empty list: %s".format(variance(List())))
+println("Variance of an non-empty list: %s".format(variance(List(1.0, 1.5))))
+
 // Sometimes, we want to turn an undefined 'Option' into an exception. In this case,
 // we can simply do: option.getOrElse(throw new Exception("Uh oh"))
 
