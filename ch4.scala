@@ -311,3 +311,24 @@ println("Variance of an non-empty list: %s".format(variance(List(1.0, 1.5))))
     } yield (x, y)
   ))
 }
+
+{
+  // Option helps a bit with error handling. However, it unfortunately causes
+  // us to completely lose our exception stack-trace + error messages.
+
+  // Either is like Option -- it has two cases. However, both cases carry a value!
+  sealed trait Eithr[+E, +A]
+  case class Rght [+A] (value: A) extends Eithr[Nothing, A]
+  case class Lft [+E] (value: E) extends Eithr[E, Nothing]
+
+  // We can use the 'Left' value to hold an exception:
+  def successInt(): Eithr[Exception, Int] =
+    Rght(1)
+
+  def failInt(): Eithr[Exception, Int] =
+    Lft(new Exception("Wat"))
+
+  def failInt2(): Eithr[Exception, Int] =
+    try throw new Exception("Hat")
+    catch { case e: Exception => Lft(e) }
+}
