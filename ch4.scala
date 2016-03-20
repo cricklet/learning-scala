@@ -59,47 +59,47 @@
 sealed trait Optn[+A] {
   def map [B] (f: A => B): Optn [B] = this match {
     case Sm(v) => Sm(f(v))
-    case None => None
+    case Nn => Nn
   }
 
   // "B >: A" means that A 'is a' B
   // "default: => B" means that 'default' won't be evaluated until it's needed (laziness)
   def getOrElse [B >: A] (default: => B): B = this match {
     case Sm(v) => v
-    case None => default
+    case Nn => default
   }
 
   //def flatMap [B] (f: A => Optn[B]): Optn [B] = {
   //  // this.map(f) returns Optn[Optn[B]] eeeek
-  //  this.map(f) getOrElse None
+  //  this.map(f) getOrElse Nn
   //}
 
   def flatMap [B] (f: A => Optn[B]): Optn [B] = this match {
     case Sm(v) => f(v)
-    case None => None
+    case Nn => Nn
   }
 
   // def orElse [B >: A] (default: => Optn[B]): Optn [B] =
   //  map(a => Sm(a)) getOrElse default
 
   def orElse [B >: A] (default: => Optn[B]): Optn [B] = this match {
-    case None => default
+    case Nn => default
     case _ => this // Sm(a) => Sm(a)
   }
 
   // def filter (f: A => Boolean): Optn [A] =
-  //  flatMap(a => if (f(a)) Sm(a) else None)
+  //  flatMap(a => if (f(a)) Sm(a) else Nn)
 
   def filter (f: A => Boolean): Optn [A] = this match {
     case Sm(v) if f(v) => Sm(v)
-    case _ => None
+    case _ => Nn
   }
 }
 case class Sm[+A] (get: A) extends Optn[A]
-case object None extends Optn[Nothing]
+case object Nn extends Optn[Nothing]
 
 def mean (xs: Seq[Double]): Optn[Double] =
-  if (xs.isEmpty) None
+  if (xs.isEmpty) Nn
   else Sm(xs.sum / xs.length)
 
 println("Mean of an empty list: %s".format(mean(List())))
