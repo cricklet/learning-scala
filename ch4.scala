@@ -215,3 +215,27 @@ println("Variance of an non-empty list: %s".format(variance(List(1.0, 1.5))))
   val list0 = List(Some(0), None, Some(2), Some(3), None)
   println("%s turns into %s when passed through sequence".format(list0, sequence(list0)))
 }
+{
+  // We can easiy turn exceptions into None through a 'Try' helper function.
+  def Try [A] (a: => A): Option[A] =
+    try Some(a)
+    catch { case e: Exception => None }
+
+  // Note: the usage of "a: => A" is crucial! That means that 'a' is only evaluated
+  // once it's needed.
+
+  // Check out what happens if we don't lazily evaluate 'a'.
+  def BadTry [A] (a: A): Option[A] =
+    try Some(a)
+    catch { case e: Exception => None }
+
+  def failInt (): Int =
+    throw new Exception("Bad int :(")
+
+  println("Here's Try: %s".format(Try(failInt())))
+  try {
+    println("Here's BadTry: %s".format(BadTry(failInt())))
+  } catch {
+    case e: Exception => println("See? BadTry errors!")
+  }
+}
