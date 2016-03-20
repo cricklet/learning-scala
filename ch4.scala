@@ -240,4 +240,22 @@ println("Variance of an non-empty list: %s".format(variance(List(1.0, 1.5))))
   } catch {
     case e: Exception => println("See? BadTry errors!")
   }
+
+  // Let's use sequence() & Try to turn a list of Strings into Ints!
+  def parseInt (strs: List[String]): Option[List[Int]] =
+    sequence(strs map (s => Try(s.toInt)))
+
+  val list2 = List("1", "2", "a")
+  val list3 = List("1", "2", "3")
+
+  println("%s parsed as ints gives %s".format(list2, parseInt(list2)))
+  println("%s parsed as ints gives %s".format(list3, parseInt(list3)))
+
+  // Using sequence for this, though, is a little awkward. Let's write
+  // new helper:
+  def traverse [A, B] (as: List[A])(f: A => Option[B]): Option[List[B]] =
+    sequence(as map f)
+
+  println("%s traversed as ints gives %s".format(list2, traverse(list2)(x => Try(x.toInt))))
+  println("%s traversed as ints gives %s".format(list3, traverse(list3)(x => Try(x.toInt))))
 }
