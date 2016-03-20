@@ -105,3 +105,5 @@ def mean (xs: Seq[Double]): Optn[Double] =
 println("Mean of an empty list: %s".format(mean(List())))
 println("Mean of an non-empty list: %s".format(mean(List(1.0, 1.5))))
 
+def variance (xs: Seq[Double]): Optn[Double] =
+  mean(xs).flatMap(m => mean(xs.map(x => math.pow(x - m, 2))))
