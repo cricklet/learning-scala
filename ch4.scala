@@ -1,6 +1,3 @@
-// Hide 'Option' and 'Either'
-import scala.{Option => _, Either => _, _}
-
 {
   // What's so bad about exceptions?
   // Well, if you're trying to do FP, they're not referentially transparent!
@@ -58,8 +55,9 @@ import scala.{Option => _, Either => _, _}
 }
 
 // Instead, we can use 'Option' (which is like Haskell's "Maybe")
-sealed trait Option[+A] {
-  def map [B] (f: A => B): Option [B] = this match {
+// Let's call ours 'Optn' to avoid namespace collision.
+sealed trait Optn[+A] {
+  def map [B] (f: A => B): Optn [B] = this match {
     case Some(v) => Some(f(v))
     case None => None
   }
@@ -71,36 +69,36 @@ sealed trait Option[+A] {
     case None => default
   }
 
-  //def flatMap [B] (f: A => Option[B]): Option [B] = {
-  //  // this.map(f) returns Option[Option[B]] eeeek
+  //def flatMap [B] (f: A => Optn[B]): Optn [B] = {
+  //  // this.map(f) returns Optn[Optn[B]] eeeek
   //  this.map(f) getOrElse None
   //}
 
-  def flatMap [B] (f: A => Option[B]): Option [B] = this match {
+  def flatMap [B] (f: A => Optn[B]): Optn [B] = this match {
     case Some(v) => f(v)
     case None => None
   }
 
-  // def orElse [B >: A] (default: => Option[B]): Option [B] =
+  // def orElse [B >: A] (default: => Optn[B]): Optn [B] =
   //  map(a => Some(a)) getOrElse default
 
-  def orElse [B >: A] (default: => Option[B]): Option [B] = this match {
+  def orElse [B >: A] (default: => Optn[B]): Optn [B] = this match {
     case None => default
     case _ => this // Some(a) => Some(a)
   }
 
-  // def filter (f: A => Boolean): Option [A] =
+  // def filter (f: A => Boolean): Optn [A] =
   //  flatMap(a => if (f(a)) Some(a) else None)
 
-  def filter (f: A => Boolean): Option [A] = this match {
+  def filter (f: A => Boolean): Optn [A] = this match {
     case Some(v) if f(v) => Some(v)
     case _ => None
   }
 }
-case class Some[+A] (get: A) extends Option[A]
-case object None extends Option[Nothing]
+case class Some[+A] (get: A) extends Optn[A]
+case object None extends Optn[Nothing]
 
-def mean (xs: Seq[Double]): Option[Double] =
+def mean (xs: Seq[Double]): Optn[Double] =
   if (xs.isEmpty) None
   else Some(xs.sum / xs.length)
 
