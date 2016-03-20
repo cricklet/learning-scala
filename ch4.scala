@@ -168,3 +168,32 @@ println("Variance of an non-empty list: %s".format(variance(List(1.0, 1.5))))
 //       if (!f.exists()) None
 //       else Some(new FileInputStream(f))
 //     }
+
+{
+  // How can functions that are built to work with simple values be applied
+  // to Option values?
+
+  // Lift!
+  def lift [A, B] (f: A => B) : Option[A] => Option[B] =
+    optA => optA.map(f)
+
+  val optX: Option[Int] = Some(-4)
+  val absX = lift(math.abs)(optX)
+  println("abs of %s is %s".format(optX, absX))
+
+  // What about combining two Option values using a function?
+  def map2 [A, B, C] (a: Option[A], b: Option[B])(f: (A, B) => C): Option[C] = (a, b) match {
+    case (None, _) => None
+    case (_, None) => None
+    case (Some(av), Some(bv)) => Some(f(av, bv))
+  }
+
+  // Although, I tentatively disagree with the book on this. I think writing
+  // a function 'lift2' that operates like 'lift' is clearer...
+  def lift2 [A, B, C] (f: (A, B) => C): (Option[A], Option[B]) => Option[C] =
+    (optA, optB) => (optA, optB) match {
+      case (None, _) => None
+      case (_, None) => None
+      case (Some(a), Some(b)) => Some(f(a, b))
+    }
+}
