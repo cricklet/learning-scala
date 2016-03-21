@@ -333,42 +333,8 @@ println("Variance of an non-empty list: %s".format(variance(List(1.0, 1.5))))
     catch { case e: Exception => Lft(e) }
 }
 {
-  // Let's hammer down covariance & contravariance once and for all.
-  class Drink
-  class SoftDrink extends Drink
-  class Cola extends SoftDrink
-  class Pepsi extends SoftDrink
-  class Water extends Drink
-
-  // Boring normal vending machine.
-  // This one can accept all types of drinks.
-  class Vending (drinks: Drink*) {
-    println("Vending (%s)".format(drinks))
-  }
-
-  new Vending(new Drink(), new SoftDrink(), new Water())
-
-  // Invariant vending machine
-  class InvariantVending [D] (drinks: D*)
-
-  val iv0: InvariantVending[SoftDrink] = // This works!
-    new InvariantVending[SoftDrink](new SoftDrink(), new Cola(), new Pepsi())
-  // val iv1: InvariantVending[Drink] = // But this DOES NOT because of invariance
-  //   new InvariantVending[SoftDrink](new SoftDrink(), new Cola(), new Pepsi())
-
-  // Covariant vending machine
-  class CovariantVending [+D] (drinks: D*)
-
-  val cv0: CovariantVending[SoftDrink] = // This works!
-    new CovariantVending[SoftDrink](new SoftDrink(), new Cola(), new Pepsi())
-  val cv1: CovariantVending[Drink] = // And so does this!
-    new CovariantVending[SoftDrink](new SoftDrink(), new Cola(), new Pepsi())
-
-  // Contravariance... is kind of weird. Not sure yet of the usefulness of this in day-to-day coding.
-  class ContravariantVending [-D] (drinks: D*)
-
-  val ctv0: ContravariantVending[SoftDrink] =
-    new ContravariantVending[SoftDrink](new SoftDrink(), new Cola(), new Pepsi())
-  val ctv1: ContravariantVending[SoftDrink] =
-    new ContravariantVending[Drink](new SoftDrink(), new Cola(), new Pepsi())
+  // Alright, I think I finally have co-variance, contra-variance, in-variance down.
+  // The videos by Arnaldo Pedro Figueira Figueira (dat name) helped a ton:
+  //   Subtyping + Generics (https://www.youtube.com/watch?v=hgQqr-pA-c4)
+  //   Variance (https://www.youtube.com/watch?v=pgCD10nu_30)
 }
