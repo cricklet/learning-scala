@@ -317,7 +317,29 @@ println("Variance of an non-empty list: %s".format(variance(List(1.0, 1.5))))
   // us to completely lose our exception stack-trace + error messages.
 
   // Either is like Option -- it has two cases. However, both cases carry a value!
-  sealed trait Eithr[+E, +A]
+  sealed trait Eithr [+E, +A] {
+    def map [B] (f: A => B): Eithr[E, B] = this match {
+      case Rght(v) => Rght(f(v))
+      case Lft(e) => Lft(e)
+    }
+    // Because the type parameter 'E' is co-variant, somebody should be able to
+    // use Eithr[E, A] as an Either[EE, AA] where EE is-an E (EE >: E) and AA is-an A.
+    // This is known as Liskov subsitution-- and it means that to include a
+    // co-variant type parameter in the types of a method's parameters, you must
+    // accept an arbitrary super-type of that type parameter.
+    def flatMap [EE >: E, B] (f: A => Eithr[EE, B]): Eithr[EE, B] = this match {
+      case Lft(e) => Lft(e)
+      case Rght(v) => f(v)
+    }
+    def orElse [EE >: E, AA >: A] (default: => Eithr[EE, AA]): Eithr[EE, AA] = this match {
+      case Lft(e) => default
+      case Rght(v) => Rght(v)
+    }
+    def getOrElse [AA >: A] (default: => AA): Eithr[E, AA] = this match {
+      case Lft(e) => Rght(default)
+      case Rght(v) => Rght(v)
+    }
+  }
   case class Rght [+A] (value: A) extends Eithr[Nothing, A]
   case class Lft [+E] (value: E) extends Eithr[E, Nothing]
 
