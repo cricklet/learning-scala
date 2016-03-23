@@ -38,6 +38,14 @@
 
   def evalThunks3 [A] (thunk: => A): A = { thunk; thunk; thunk }
   println("count() 3 times: %s".format(evalThunks3(count())))
+
+  // You can use a thunk in a constructor argument
+  class AttemptingToThunk (thunk: => Int) {
+    def think (): Int = thunk
+  }
+
+  new AttemptingToThunk({ println("This won't run."); 3 })
+  new AttemptingToThunk({ println("This will run."); 3 }).think()
 }
 {
   // Now, let's talk about the "lazy" keyword.
