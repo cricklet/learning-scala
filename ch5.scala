@@ -39,7 +39,7 @@
   def evalThunks3 [A] (thunk: => A): A = { thunk; thunk; thunk }
   println("count() 3 times: %s".format(evalThunks3(count())))
 
-  // You can use a thunk in a constructor argument
+  // You can use a thunk as a constructor param.
   class AttemptingToThunk (thunk: => Int) {
     def think (): Int = thunk
   }
@@ -47,6 +47,62 @@
   new AttemptingToThunk({ println("This won't run."); 3 })
   new AttemptingToThunk({ println("This will run."); 3 }).think()
 }
+// Let's write a lazy list implementation.
+sealed trait Stream[+A] {
+  def printFirst[A] (num: Int): String =
+    if (num <= 0) ""
+    else this match {
+      case Cons(fx, fxs) => fx().toString() + fxs().printFirst(num - 1)
+      case Empty => ""
+    }
+}
+
+// Unfortunately, you can't use a thunk (call-by-name) as a constructor
+// parameter for case classes (because case class params are defaulted
+// to public 'val's)
+
+// So, we will have to use explicit thunks
+case object Empty extends Stream[Nothing]
+case class Cons[+A] (x: () => A, xs: () => Stream[A]) extends Stream[A]
+
+// Luckily, we can write helper methods that hide those ugly explicit
+// thunks behind an interface that can use call-by-name thunks.
+object Stream {
+  def cons[A] (x: => A, xs: => Stream[A]): Stream[A] = {
+    lazy val y = x
+    lazy val ys = xs
+    Cons(() => y, () => ys)
+  }
+  def empty[A]: Stream[A] = Empty
+
+  // This helper actually completely destroys the purpose of a lazy
+  // Stream data type!!! The variadic argument array 'args' cannot
+  // include thunks.
+
+  // In other words, if you do Stream({ println("Blah"); 1 }), then
+  // "Blah" will be printed!
+  def apply[A] (args: A*): Stream[A] =
+    if (args.isEmpty) empty
+    else cons(args.head, apply(args.tail: _*))
+}
+
+// Man, this Stream constructor sucks. It defeats the purpose of the
+// lazy Cons underlying it.
+Stream({ println("Wtf :("); 1 })
+
+// But that's okay. I guess I can just use 'cons'.
+Stream.cons({ println("At least this doesn't run."); 1 }, Stream.empty)
+
+// Well, considering I can't use the constructor...
+val s = Stream.cons({ println("First."); 1 },
+  Stream.cons({ println("Second."); 2 },
+    Stream.cons({ println("Third."); 3 },
+      Stream.cons({ println("Fourth."); 4 },
+        Stream.empty)))) // Lol yay lisp
+
+println("Generated list of 4 elements: %s".format(s))
+println("Here's the first 2: %s".format(s.printFirst(2)))
+
 {
   // Quick aside... I need to understand constructor parameters.
   class Counter (
