@@ -368,7 +368,13 @@ println("Variance of an non-empty list: %s".format(variance(List(1.0, 1.5))))
     val mapped: List[Eithr[E,B]] = list.map(f)
     sequence(mapped)
   }
-
+}
+{
+  // If I wanted to have a version of Either that allows multiple errors, I could
+  // use a datatype something like:
+  sealed trait Eithers[+E, +A]
+  case class Lfts[E] (errors: Seq[E]) extends Eithers[E, Nothing]
+  case class Rght[A] (value: A) extends Eithers[Nothing, A]
 }
 {
   // Alright, I think I finally have co-variance, contra-variance, in-variance down.
