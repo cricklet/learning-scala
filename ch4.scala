@@ -353,6 +353,22 @@ println("Variance of an non-empty list: %s".format(variance(List(1.0, 1.5))))
   def failInt2(): Eithr[Exception, Int] =
     try throw new Exception("Hat")
     catch { case e: Exception => Lft(e) }
+
+  // Let's implement sequence & traverse on Either.
+  def sequence [E,A] (list: List[Eithr[E,A]]): Eithr[E, List[A]] = list match {
+    case Nil => Rght(Nil)
+    case Lft(x) :: xs => Lft(x)
+    case Rght(x) :: xs => sequence(xs) match {
+      case Lft(y) => Lft(y)
+      case Rght(y) => Rght(x :: y)
+    }
+  }
+
+  def traverse [E,A,B] (list: List[A])(f: A => Eithr[E,B]): Eithr[E,List[B]] = {
+    val mapped: List[Eithr[E,B]] = list.map(f)
+    sequence(mapped)
+  }
+
 }
 {
   // Alright, I think I finally have co-variance, contra-variance, in-variance down.
