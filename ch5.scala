@@ -25,7 +25,8 @@
   // In 'badIf', onTrue & onFalse are like explicitly created "thunks."
 
   // However, what we really want to do is pass in a normal expression
-  // as a "thunk":
+  // as a "thunk". This is sometimes referred to as call-by-name rather
+  // than call-by-value.
   def goodIf [A] (cond: Boolean, onTrue: => A, onFalse: => A): A =
     if (cond) onTrue else onFalse
 
