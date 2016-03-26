@@ -63,6 +63,14 @@ sealed trait Stream[+A] {
       case SNil => SNil
     }
 
+  def takeWhile (shouldTake: A => Boolean): Stream[A] =
+    this match {
+      case SCons(fx, fxs) =>
+        if (shouldTake(fx())) Stream.cons(fx(), fxs().takeWhile(shouldTake))
+        else SNil
+      case SNil => SNil
+    }
+
   def toList (): List[A] = this match {
     case SNil => Nil
     case SCons(fx, fxs) => fx() :: fxs().toList()
@@ -118,6 +126,7 @@ println("Here's the first 2: %s".format(s.printFirst(2)))
 println("Here's the stream as a list: %s".format(s.toList()))
 println("Here's the the first 2 as a stream: %s".format(s.take(2)))
 println("Here's the the first 2 as a stream turned into a list: %s".format(s.take(2).toList()))
+println("Take while less than 3: %s".format(s.takeWhile(x => x < 3).toList()))
 
 {
   // Quick aside... I need to understand constructor parameters.
