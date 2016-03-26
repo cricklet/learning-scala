@@ -112,10 +112,11 @@ sealed trait Stream[+A] {
       else as
     })
 
+  def append [AA>:A] (s: Stream[AA]): Stream[AA] =
+    foldRight(s)((a, bs) => Stream.cons(a, bs))
+
   def flatMap [B] (g: A => Stream[B]): Stream[B] =
-    foldRight(SNil: Stream[B])((a, bs) => g(a) match {
-      case SCons(fb, _) => Stream.cons(fb(), bs)
-    })
+    foldRight(SNil: Stream[B])((a, bs) => g(a).append(bs))
 
 }
 
@@ -181,6 +182,7 @@ println("Is the stream all greater than -1? %s".format(t.forAll(_ > -1)))
 println("Take while (w/ fold) less than 3: %s".format(s.takeWhileWithFold(x => x < 3).toList()))
 println("Map increment? %s".format(t.map(_ + 1).toList()))
 println("Filter even? %s".format(t.filter(_ % 2 == 0).toList()))
+println("Appending Stream(5): %s".format(t.append(Stream(5)).toList()))
 
 println("headOption of [1]: %s".format(Stream(1).headOption()))
 println("headOption of []: %s".format(Stream().headOption()))
