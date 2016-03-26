@@ -200,6 +200,8 @@ val u = Stream.cons({ println("First."); 1 },
       Stream.cons({ println("Fourth."); 4 },
         Stream.empty)))) // Lol yay lisp
 
+// This is similar to an optimized for-loop. In fact, many people describe
+// streams as "first class loops."
 println("Mapping the first 2 elements: %s".format(u.map(_+10).take(2).toList()))
 
 {
