@@ -120,7 +120,6 @@ sealed trait Stream[+A] {
 
   def flatMap [B] (g: A => Stream[B]): Stream[B] =
     foldRight(SNil: Stream[B])((a, bs) => g(a).append(bs))
-
 }
 
 // Unfortunately, you can't use a thunk (call-by-name) as a constructor
@@ -140,6 +139,12 @@ object Stream {
     SCons(() => y, () => ys)
   }
   def empty[A]: Stream[A] = SNil
+
+  def unfold [A, S](state: S)(f: S => Option[(A, S)]): Stream[A] =
+    f(state) match {
+      case Some((a, newState)) => Stream.cons(a, unfold(newState)(f))
+      case _ => SNil
+    }
 
   def apply[A] (args: A*): Stream[A] =
     // This helper actually completely destroys the purpose of a lazy
@@ -298,3 +303,52 @@ println("Mapping the first 2 elements: %s".format(u.map(_+10).take(2).toList()))
   val i = new InfInt(1)
   println("Here's a inf series of integers: %s, %s, %s...".format(i, i.next, i.next.next))
 }
+
+// Let's do some infinite streams.
+val infOnes: Stream[Int] = Stream.cons(1, infOnes)
+println("5 ones: %s".format(infOnes.take(5).toList()))
+
+def infConst [A] (a: A): Stream[A] = {
+  infOnes.map(x => a)
+}
+println("5 bananas: %s".format(infConst("banana").take(5).toList()))
+
+def infInc (n: Int): Stream[Int] = {
+  Stream.cons(n, infInc(n+1))
+}
+
+println("Infinite increment for 5: %s".format(infInc(0).take(5).toList()))
+
+def fib (): Stream[Int] = {
+  lazy val _fib: (Int, Int) => Stream[Int] =
+    (n0: Int, n1: Int) => Stream.cons(n0, _fib(n1, n0 + n1))
+  _fib(0, 1)
+}
+
+println("Infinite fibonacci for 5: %s".format(fib().take(5).toList()))
+
+// Recursive functions generally consume data by breaking it up into smaller
+// and smaller chunks -- until the function terminates.
+
+// Corecursive functions generally produce data. They terminate when they are
+// no longer productive.
+
+// Unfold is, of course, a corecursive function. Here, we can use it to generate
+// infinite lists.
+
+println("Unfold: 5 bananas: %s".format(
+  Stream.unfold(None)(_ => Some(("banana", None)))
+  .take(5).toList()
+))
+println("Unfold: infinite increment for 5: %s".format(
+  Stream.unfold(0)(n => Some((n, n + 1)))
+  .take(5).toList()
+))
+println("Unfold: infinite fib for 5: %s".format(
+  Stream.unfold(
+    (0, 1)
+  )(_ match {
+    case (n0, n1) => Some(n0, (n0, n1))
+  })
+  .take(5).toList()
+))
