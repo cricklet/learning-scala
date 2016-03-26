@@ -56,6 +56,13 @@ sealed trait Stream[+A] {
       case SNil => ""
     }
 
+  def take (n: Int): Stream[A] =
+    if (n <= 0) SNil
+    else this match {
+      case SCons(fx, fxs) => Stream.cons(fx(), fxs().take(n - 1))
+      case SNil => SNil
+    }
+
   def toList (): List[A] = this match {
     case SNil => Nil
     case SCons(fx, fxs) => fx() :: fxs().toList()
@@ -106,8 +113,11 @@ val s = Stream.cons({ println("First."); 1 },
       Stream.cons({ println("Fourth."); 4 },
         Stream.empty)))) // Lol yay lisp
 
-println("Generated list of 4 elements: %s".format(s))
+println("Generated stream of 4 elements: %s".format(s))
 println("Here's the first 2: %s".format(s.printFirst(2)))
+println("Here's the stream as a list: %s".format(s.toList()))
+println("Here's the the first 2 as a stream: %s".format(s.take(2)))
+println("Here's the the first 2 as a stream turned into a list: %s".format(s.take(2).toList()))
 
 {
   // Quick aside... I need to understand constructor parameters.
