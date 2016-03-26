@@ -106,6 +106,12 @@ sealed trait Stream[+A] {
       Stream.cons(f(a), bs)
     })
 
+  def filter (f: A => Boolean): Stream[A] =
+    foldRight(SNil: Stream[A])((a, as) => {
+      if (f(a)) Stream.cons(a, as)
+      else as
+    })
+
 }
 
 // Unfortunately, you can't use a thunk (call-by-name) as a constructor
@@ -169,6 +175,7 @@ println("Is the stream all less than 3? %s".format(t.forAll(_ < 2)))
 println("Is the stream all greater than -1? %s".format(t.forAll(_ > -1)))
 println("Take while (w/ fold) less than 3: %s".format(s.takeWhileWithFold(x => x < 3).toList()))
 println("Map increment? %s".format(t.map(_ + 1).toList()))
+println("Filter even? %s".format(t.filter(_ % 2 == 0).toList()))
 
 println("headOption of [1]: %s".format(Stream(1).headOption()))
 println("headOption of []: %s".format(Stream().headOption()))
