@@ -76,6 +76,17 @@ sealed trait Stream[+A] {
     case SCons(fx, fxs) => fx() :: fxs().toList()
   }
 
+  // Remember:
+  // "z: => B" means that 'z' is lazily evaluated
+  // "(A, =>B) => B" means that the second argument is lazily evaluated
+  def foldRight [B] (value: => B) (g: (A, =>B) => B): B = this match {
+    case SCons(fx, fxs) => g(fx(), fxs().foldRight(value)(g))
+    case _ => value
+  }
+
+  def forAll (toBoolean: A => Boolean): Boolean =
+    foldRight(true)((x, bool) => toBoolean(x) && bool)
+
 }
 
 // Unfortunately, you can't use a thunk (call-by-name) as a constructor
@@ -127,6 +138,16 @@ println("Here's the stream as a list: %s".format(s.toList()))
 println("Here's the the first 2 as a stream: %s".format(s.take(2)))
 println("Here's the the first 2 as a stream turned into a list: %s".format(s.take(2).toList()))
 println("Take while less than 3: %s".format(s.takeWhile(x => x < 3).toList()))
+
+// Gotta reset to test that my forAll works properly
+val t = Stream.cons({ println("First."); 1 },
+  Stream.cons({ println("Second."); 2 },
+    Stream.cons({ println("Third."); 3 },
+      Stream.cons({ println("Fourth."); 4 },
+        Stream.empty)))) // Lol yay lisp
+
+println("Is the stream all less than 3? %s".format(t.forAll(_ < 2)))
+println("Is the stream all greater than -1? %s".format(t.forAll(_ > -1)))
 
 {
   // Quick aside... I need to understand constructor parameters.
