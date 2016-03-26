@@ -75,13 +75,13 @@ object Stream {
   }
   def empty[A]: Stream[A] = Empty
 
-  // This helper actually completely destroys the purpose of a lazy
-  // Stream data type!!! The variadic argument array 'args' cannot
-  // include thunks.
-
-  // In other words, if you do Stream({ println("Blah"); 1 }), then
-  // "Blah" will be printed!
   def apply[A] (args: A*): Stream[A] =
+    // This helper actually completely destroys the purpose of a lazy
+    // Stream data type!!! The variadic argument array 'args' cannot
+    // include thunks.
+    //
+    // In other words, if you do Stream({ println("Blah"); 1 }), then
+    // "Blah" will be printed!
     if (args.isEmpty) empty
     else cons(args.head, apply(args.tail: _*))
 }
