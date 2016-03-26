@@ -112,6 +112,11 @@ sealed trait Stream[+A] {
       else as
     })
 
+  def flatMap [B] (g: A => Stream[B]): Stream[B] =
+    foldRight(SNil: Stream[B])((a, bs) => g(a) match {
+      case SCons(fb, _) => Stream.cons(fb(), bs)
+    })
+
 }
 
 // Unfortunately, you can't use a thunk (call-by-name) as a constructor
