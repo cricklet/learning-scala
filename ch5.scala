@@ -87,6 +87,11 @@ sealed trait Stream[+A] {
   def forAll (toBoolean: A => Boolean): Boolean =
     foldRight(true)((x, bool) => toBoolean(x) && bool)
 
+  def takeWhileWithFold (shouldTake: A => Boolean): Stream[A] =
+    foldRight(SNil: Stream[A])((x, xs) => {
+      if (shouldTake(x)) Stream.cons(x, xs)
+      else SNil
+    })
 }
 
 // Unfortunately, you can't use a thunk (call-by-name) as a constructor
@@ -148,6 +153,7 @@ val t = Stream.cons({ println("First."); 1 },
 
 println("Is the stream all less than 3? %s".format(t.forAll(_ < 2)))
 println("Is the stream all greater than -1? %s".format(t.forAll(_ > -1)))
+println("Take while (w/ fold) less than 3: %s".format(s.takeWhileWithFold(x => x < 3).toList()))
 
 {
   // Quick aside... I need to understand constructor parameters.
