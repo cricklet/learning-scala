@@ -52,9 +52,15 @@ sealed trait Stream[+A] {
   def printFirst[A] (num: Int): String =
     if (num <= 0) ""
     else this match {
-      case Cons(fx, fxs) => fx().toString() + fxs().printFirst(num - 1)
-      case Empty => ""
+      case SCons(fx, fxs) => fx().toString() + fxs().printFirst(num - 1)
+      case SNil => ""
     }
+
+  def toList (): List[A] = this match {
+    case SNil => Nil
+    case SCons(fx, fxs) => fx() :: fxs().toList()
+  }
+
 }
 
 // Unfortunately, you can't use a thunk (call-by-name) as a constructor
@@ -62,8 +68,8 @@ sealed trait Stream[+A] {
 // to public 'val's)
 
 // So, we will have to use explicit thunks
-case object Empty extends Stream[Nothing]
-case class Cons[+A] (x: () => A, xs: () => Stream[A]) extends Stream[A]
+case object SNil extends Stream[Nothing]
+case class SCons[+A] (x: () => A, xs: () => Stream[A]) extends Stream[A]
 
 // Luckily, we can write helper methods that hide those ugly explicit
 // thunks behind an interface that can use call-by-name thunks.
@@ -71,9 +77,9 @@ object Stream {
   def cons[A] (x: => A, xs: => Stream[A]): Stream[A] = {
     lazy val y = x
     lazy val ys = xs
-    Cons(() => y, () => ys)
+    SCons(() => y, () => ys)
   }
-  def empty[A]: Stream[A] = Empty
+  def empty[A]: Stream[A] = SNil
 
   def apply[A] (args: A*): Stream[A] =
     // This helper actually completely destroys the purpose of a lazy
