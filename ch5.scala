@@ -92,6 +92,15 @@ sealed trait Stream[+A] {
       if (shouldTake(x)) Stream.cons(x, xs)
       else SNil
     })
+
+  def headOption (): Option[A] = this match {
+    case SCons(fx, _) => Some(fx())
+    case _ => None
+  }
+
+  def headOptionObfuscated (): Option[A] =
+    foldRight(None: Option[A])((x, _) => Some(x))
+
 }
 
 // Unfortunately, you can't use a thunk (call-by-name) as a constructor
@@ -154,6 +163,12 @@ val t = Stream.cons({ println("First."); 1 },
 println("Is the stream all less than 3? %s".format(t.forAll(_ < 2)))
 println("Is the stream all greater than -1? %s".format(t.forAll(_ > -1)))
 println("Take while (w/ fold) less than 3: %s".format(s.takeWhileWithFold(x => x < 3).toList()))
+
+println("headOption of [1]: %s".format(Stream(1).headOption()))
+println("headOption of []: %s".format(Stream().headOption()))
+
+println("headOption of [1]: %s".format(Stream(1).headOptionObfuscated()))
+println("headOption of []: %s".format(Stream().headOptionObfuscated()))
 
 {
   // Quick aside... I need to understand constructor parameters.
