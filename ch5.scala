@@ -101,6 +101,11 @@ sealed trait Stream[+A] {
     case _ => None
   }
 
+  def tail (): Stream[A] = this match {
+    case SCons(_, fxs) => fxs()
+    case _ => SNil
+  }
+
   def headOptionObfuscated (): Option[A] =
     foldRight(None: Option[A])((x, _) => Some(x))
 
@@ -120,6 +125,53 @@ sealed trait Stream[+A] {
 
   def flatMap [B] (g: A => Stream[B]): Stream[B] =
     foldRight(SNil: Stream[B])((a, bs) => g(a).append(bs))
+
+  // I'm not quite convinced of the benifit of using higher order functions
+  // like this... It seems less readable :/
+  def mapViaUnfold [B] (f: A => B): Stream[B] =
+    Stream.unfold(this: Stream[A])(_ match {
+      case SCons(x, xs) => Some((f(x()), xs()))
+      case _ => None
+    })
+
+  def takeViaUnfold (n: Int): Stream[A] =
+    Stream.unfold((this, n))(_ match {
+      case (_, 0) => None
+      case (SCons(x, xs), n) => Some((x(), (xs(), n-1)))
+      case _ => None
+    })
+
+  def takeWhileViaUnfold (f: A => Boolean): Stream[A] =
+    Stream.unfold(this)(_ match {
+      case SCons(fx, fxs) => {
+        lazy val x = fx()
+        lazy val xs = fxs()
+        if (f(x)) Some(x, xs)
+        else None
+      }
+      case _ => None
+    })
+
+  def zipWith [B, C] (otherStream: Stream[B])(f: (A, B) => C): Stream[C] =
+    // Uh...
+    Stream.unfold((this, otherStream))(_ match {
+      case (SCons(fa, fas), SCons(fb, fbs)) => {
+        val c = f(fa(), fb())
+        Some(c, (fas(), fbs()))
+      }
+      case _ => None
+    })
+
+  def zipAll[B](otherStream: Stream[B]): Stream[(Option[A],Option[B])] =
+    // Oh lord.
+    Stream.unfold((this, otherStream))(_ match {
+      case (SNil, SNil) => None
+      case (SCons(fa, fas), SNil) => Some((Some(fa()), None), (fas(), SNil))
+      case (SNil, SCons(fb, fbs)) => Some((None, Some(fb())), (SNil, fbs()))
+      case (SCons(fa, fas), SCons(fb, fbs)) => {
+        Some((Some(fa()), Some(fb())), (fas(), fbs()))
+      }
+    })
 }
 
 // Unfortunately, you can't use a thunk (call-by-name) as a constructor
@@ -351,4 +403,14 @@ println("Unfold: infinite fib for 5: %s".format(
     case (n0, n1) => Some(n0, (n0, n1))
   })
   .take(5).toList()
+))
+
+// Let's make sure that our viaUnfold functions work
+println("Implementing the other HOFs using unfold: %s".format(
+  fib().mapViaUnfold(_+10).takeViaUnfold(10).takeWhileViaUnfold(_ < 15).toList()
+))
+
+// Just making sure these things work...
+println("Implementing zipAll using unfold: %s".format(
+  fib().take(10).zipAll(infInc(0).take(5)).toList()
 ))
