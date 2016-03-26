@@ -101,6 +101,11 @@ sealed trait Stream[+A] {
   def headOptionObfuscated (): Option[A] =
     foldRight(None: Option[A])((x, _) => Some(x))
 
+  def map [B] (f: A => B): Stream[B] =
+    foldRight(SNil: Stream[B])((a, bs) => {
+      Stream.cons(f(a), bs)
+    })
+
 }
 
 // Unfortunately, you can't use a thunk (call-by-name) as a constructor
@@ -163,6 +168,7 @@ val t = Stream.cons({ println("First."); 1 },
 println("Is the stream all less than 3? %s".format(t.forAll(_ < 2)))
 println("Is the stream all greater than -1? %s".format(t.forAll(_ > -1)))
 println("Take while (w/ fold) less than 3: %s".format(s.takeWhileWithFold(x => x < 3).toList()))
+println("Map increment? %s".format(t.map(_ + 1).toList()))
 
 println("headOption of [1]: %s".format(Stream(1).headOption()))
 println("headOption of []: %s".format(Stream().headOption()))
