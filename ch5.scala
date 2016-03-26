@@ -57,9 +57,12 @@ sealed trait Stream[+A] {
     }
 
   def take (n: Int): Stream[A] =
-    if (n <= 0) SNil
-    else this match {
-      case SCons(fx, fxs) => Stream.cons(fx(), fxs().take(n - 1))
+    this match {
+      case SCons(fx, fxs) => {
+        if (n <= 0) SNil
+        if (n == 1) Stream.cons(fx(), SNil)
+        else Stream.cons(fx(), fxs().take(n - 1))
+      }
       case SNil => SNil
     }
 
@@ -189,6 +192,15 @@ println("headOption of []: %s".format(Stream().headOption()))
 
 println("headOption of [1]: %s".format(Stream(1).headOptionObfuscated()))
 println("headOption of []: %s".format(Stream().headOptionObfuscated()))
+
+// Note: these functions are incremental!
+val u = Stream.cons({ println("First."); 1 },
+  Stream.cons({ println("Second."); 2 },
+    Stream.cons({ println("Third."); 3 },
+      Stream.cons({ println("Fourth."); 4 },
+        Stream.empty)))) // Lol yay lisp
+
+println("Mapping the first 2 elements: %s".format(u.map(_+10).take(2).toList()))
 
 {
   // Quick aside... I need to understand constructor parameters.
