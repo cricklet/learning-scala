@@ -47,6 +47,101 @@
   new AttemptingToThunk({ println("This won't run."); 3 })
   new AttemptingToThunk({ println("This will run."); 3 }).think()
 }
+
+{
+  // Quick aside... I need to understand constructor parameters.
+  class Counter (
+    i: Int, // this is "val" by default!
+    val j: Int,
+    var k: Int
+  ) {
+    def count() = {
+      // These are illegal because a "val" cannot change!
+      // i = i + 1
+      // j = j + 1
+
+      // This is fine, because "var" can change.
+      k = k + 1
+      k
+    }
+  }
+
+  val c = new Counter(0, 0, 0)
+  println("Counting %d.".format(c.count()))
+  println("Counting %d.".format(c.count()))
+  println("Counting %d.".format(c.count()))
+  println("Counting %d.".format(c.count()))
+
+  class Scopes (
+    a: Int, // just a param
+    var b: Int, // public (mutable)
+    val c: Int, // public
+    private var d: Int, // class private
+    private val e: Int, // class private
+    private[this] val f: Int // instance private
+  ) {
+    override def equals(obj: Any) = obj match {
+      case other: Scopes =>
+        // a == other.a // Can't because 'a' is simply a constructor param, not a field
+        b == other.b &&
+        c == other.c &&
+        d == other.d &&
+        e == other.e
+        // f == other.f // Can't because 'f' is private[this]!
+      case _ => false
+    }
+  }
+
+  val s = new Scopes(0,1,2,3,4,5)
+  // s.a
+  println(s.b)
+  println(s.c)
+  // s.d
+  // s.e
+  // s.f
+
+  // Note that because 'a' is simply a constructor param and  'f' is 'private[this]',
+  // they could not be included in the "equals" computations
+  println("Scopes are the same: %s".format(new Scopes(0,0,0,0,0,0) == new Scopes(1,0,0,0,0,1)))
+
+  // Running 'javap' on this results in:
+  //   Compiled from "Scopes.scala"
+  //   public class Scopes {
+  //      public int b();
+  //      public void b_$eq(int);
+  //      public int c();
+  //      public Scopes(int, int, int, int, int);
+  //   }
+}
+{
+  // Now, let's talk about the "lazy" keyword.
+  // http://stackoverflow.com/questions/7484928/what-does-a-lazy-val-do
+
+  val x = { println("This runs automatically."); 123 }
+  lazy val y = { println("This runs lazily. It should only run once!"); 456 }
+
+  println("When I evaluate 'y', it's resulting value will be cached.")
+
+  println(y)
+  println(y)
+  println(y)
+
+  // This is useful to have infinite data structures.
+  class BadInfInt (value: Int) {
+    val next = new BadInfInt(value + 1)
+  }
+
+  class InfInt (value: Int) {
+    lazy val next = new InfInt(value + 1)
+    override def toString = "%d".format(value)
+  }
+
+  // This creates a StackOverflowError!
+  // new BadInfInt(1)
+
+  val i = new InfInt(1)
+  println("Here's a inf series of integers: %s, %s, %s...".format(i, i.next, i.next.next))
+}
 // Let's write a lazy list implementation.
 sealed trait Stream[+A] {
   def printFirst[A] (num: Int): String =
@@ -260,101 +355,6 @@ val u = Stream.cons({ println("First."); 1 },
 // This is similar to an optimized for-loop. In fact, many people describe
 // streams as "first class loops."
 println("Mapping the first 2 elements: %s".format(u.map(_+10).take(2).toList()))
-
-{
-  // Quick aside... I need to understand constructor parameters.
-  class Counter (
-    i: Int, // this is "val" by default!
-    val j: Int,
-    var k: Int
-  ) {
-    def count() = {
-      // These are illegal because a "val" cannot change!
-      // i = i + 1
-      // j = j + 1
-
-      // This is fine, because "var" can change.
-      k = k + 1
-      k
-    }
-  }
-
-  val c = new Counter(0, 0, 0)
-  println("Counting %d.".format(c.count()))
-  println("Counting %d.".format(c.count()))
-  println("Counting %d.".format(c.count()))
-  println("Counting %d.".format(c.count()))
-
-  class Scopes (
-    a: Int, // just a param
-    var b: Int, // public (mutable)
-    val c: Int, // public
-    private var d: Int, // class private
-    private val e: Int, // class private
-    private[this] val f: Int // instance private
-  ) {
-    override def equals(obj: Any) = obj match {
-      case other: Scopes =>
-        // a == other.a // Can't because 'a' is simply a constructor param, not a field
-        b == other.b &&
-        c == other.c &&
-        d == other.d &&
-        e == other.e
-        // f == other.f // Can't because 'f' is private[this]!
-      case _ => false
-    }
-  }
-
-  val s = new Scopes(0,1,2,3,4,5)
-  // s.a
-  println(s.b)
-  println(s.c)
-  // s.d
-  // s.e
-  // s.f
-
-  // Note that because 'a' is simply a constructor param and  'f' is 'private[this]',
-  // they could not be included in the "equals" computations
-  println("Scopes are the same: %s".format(new Scopes(0,0,0,0,0,0) == new Scopes(1,0,0,0,0,1)))
-
-  // Running 'javap' on this results in:
-  //   Compiled from "Scopes.scala"
-  //   public class Scopes {
-  //      public int b();
-  //      public void b_$eq(int);
-  //      public int c();
-  //      public Scopes(int, int, int, int, int);
-  //   }
-}
-{
-  // Now, let's talk about the "lazy" keyword.
-  // http://stackoverflow.com/questions/7484928/what-does-a-lazy-val-do
-
-  val x = { println("This runs automatically."); 123 }
-  lazy val y = { println("This runs lazily. It should only run once!"); 456 }
-
-  println("When I evaluate 'y', it's resulting value will be cached.")
-
-  println(y)
-  println(y)
-  println(y)
-
-  // This is useful to have infinite data structures.
-  class BadInfInt (value: Int) {
-    val next = new BadInfInt(value + 1)
-  }
-
-  class InfInt (value: Int) {
-    lazy val next = new InfInt(value + 1)
-    override def toString = "%d".format(value)
-  }
-
-  // This creates a StackOverflowError!
-  // new BadInfInt(1)
-
-  val i = new InfInt(1)
-  println("Here's a inf series of integers: %s, %s, %s...".format(i, i.next, i.next.next))
-}
 
 // Let's do some infinite streams.
 val infOnes: Stream[Int] = Stream.cons(1, infOnes)
