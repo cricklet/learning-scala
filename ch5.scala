@@ -269,6 +269,18 @@ sealed trait Stream[+A] {
         Some((Some(fa()), Some(fb())), (fas(), fbs()))
       }
     })
+
+  // Implementing startsWith: perhaps I can use unfold + forAll()?
+  def startsWith [B] (other: Stream[B]): Boolean =
+    this.zipAll(other)
+    .takeWhileViaUnfold({
+      // Note: for an anonymous function like "_ match {}", I can omit the "_ match"
+      case (_, None) => false
+      case _ => true
+    })
+    .forAll({
+      case (x, y) => x == y
+    })
 }
 
 // Unfortunately, you can't use a thunk (call-by-name) as a constructor
@@ -415,4 +427,23 @@ println("Implementing the other HOFs using unfold: %s".format(
 // Just making sure these things work...
 println("Implementing zipAll using unfold: %s".format(
   fib().take(10).zipAll(infInc(0).take(5)).toList()
+))
+
+// And that startsWith works...
+val x = Stream(1,2,3)
+val y = Stream(1,2,3,4,5)
+println("%s starts with %s: %s".format(
+  x.toList(),
+  y.toList(),
+  x.startsWith(y)
+))
+println("%s starts with %s: %s".format(
+  x.toList(),
+  x.toList(),
+  x.startsWith(x)
+))
+println("%s starts with %s: %s".format(
+  y.toList(),
+  x.toList(),
+  y.startsWith(x)
 ))
