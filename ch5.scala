@@ -1,3 +1,5 @@
+import Stream._
+
 {
   // Non-strictness: a proprety of a function where the function may choose not
   // to evaluate one or more of its arguments.
@@ -154,19 +156,19 @@ sealed trait Stream[+A] {
   def take (n: Int): Stream[A] =
     this match {
       case SCons(fx, fxs) => {
-        if (n <= 0) SNil
-        if (n == 1) Stream.cons(fx(), SNil)
-        else Stream.cons(fx(), fxs().take(n - 1))
+        if (n <= 0) empty
+        if (n == 1) cons(fx(), empty)
+        else cons(fx(), fxs().take(n - 1))
       }
-      case SNil => SNil
+      case SNil => empty
     }
 
   def takeWhile (shouldTake: A => Boolean): Stream[A] =
     this match {
       case SCons(fx, fxs) =>
-        if (shouldTake(fx())) Stream.cons(fx(), fxs().takeWhile(shouldTake))
-        else SNil
-      case SNil => SNil
+        if (shouldTake(fx())) cons(fx(), fxs().takeWhile(shouldTake))
+        else empty
+      case SNil => empty
     }
 
   def toList (): List[A] = this match {
@@ -187,8 +189,8 @@ sealed trait Stream[+A] {
 
   def takeWhileWithFold (shouldTake: A => Boolean): Stream[A] =
     foldRight(SNil: Stream[A])((x, xs) => {
-      if (shouldTake(x)) Stream.cons(x, xs)
-      else SNil
+      if (shouldTake(x)) cons(x, xs)
+      else empty
     })
 
   def headOption (): Option[A] = this match {
@@ -198,7 +200,7 @@ sealed trait Stream[+A] {
 
   def tail (): Stream[A] = this match {
     case SCons(_, fxs) => fxs()
-    case _ => SNil
+    case _ => empty
   }
 
   def headOptionObfuscated (): Option[A] =
@@ -206,17 +208,17 @@ sealed trait Stream[+A] {
 
   def map [B] (f: A => B): Stream[B] =
     foldRight(SNil: Stream[B])((a, bs) => {
-      Stream.cons(f(a), bs)
+      cons(f(a), bs)
     })
 
   def filter (f: A => Boolean): Stream[A] =
     foldRight(SNil: Stream[A])((a, as) => {
-      if (f(a)) Stream.cons(a, as)
+      if (f(a)) cons(a, as)
       else as
     })
 
   def append [AA>:A] (s: Stream[AA]): Stream[AA] =
-    foldRight(s)((a, bs) => Stream.cons(a, bs))
+    foldRight(s)((a, bs) => cons(a, bs))
 
   def flatMap [B] (g: A => Stream[B]): Stream[B] =
     foldRight(SNil: Stream[B])((a, bs) => g(a).append(bs))
@@ -261,8 +263,8 @@ sealed trait Stream[+A] {
     // Oh lord.
     Stream.unfold((this, otherStream))(_ match {
       case (SNil, SNil) => None
-      case (SCons(fa, fas), SNil) => Some((Some(fa()), None), (fas(), SNil))
-      case (SNil, SCons(fb, fbs)) => Some((None, Some(fb())), (SNil, fbs()))
+      case (SCons(fa, fas), SNil) => Some((Some(fa()), None), (fas(), empty))
+      case (SNil, SCons(fb, fbs)) => Some((None, Some(fb())), (empty, fbs()))
       case (SCons(fa, fas), SCons(fb, fbs)) => {
         Some((Some(fa()), Some(fb())), (fas(), fbs()))
       }
