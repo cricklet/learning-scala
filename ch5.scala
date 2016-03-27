@@ -282,9 +282,11 @@ sealed trait Stream[+A] {
       case (x, y) => x == y
     })
 
-  def tails (): Stream[Stream[A]] = this match {
-    case SNil => SNil
-    case _ => cons(this, this.tail.tails())
+  def tails (): Stream[Stream[A]] = {
+    (this match {
+      case SNil => SNil
+      case _ => cons(this, this.tail.tails())
+    }).append(empty)
   }
 
   def forAny (toBoolean: A => Boolean): Boolean = this match {
@@ -297,6 +299,14 @@ sealed trait Stream[+A] {
 
   def hasSubsequence [B] (sub: Stream[B]): Boolean =
     tails().forAny(_.startsWith(sub))
+
+  def scanRight [B] (value: => B) (g: (A, =>B) => B): Stream[B] =
+    foldRight(Stream(value))({
+      case (a, results) => results match {
+        case SCons(fr, _) => cons(g(a, fr()), results)
+        case SNil => SNil
+      }
+    })
 }
 
 // Unfortunately, you can't use a thunk (call-by-name) as a constructor
@@ -486,4 +496,9 @@ println("Testing hasSubsequence. All of these should be false: %s".format(
     Stream(4,6),
     Stream(7)
   ).map(l.hasSubsequence(_))
+))
+
+// And that scanRight works
+println("scanRight gives: %s".format(
+  Stream(1,2,3).scanRight(0)(_ + _).toList()
 ))
