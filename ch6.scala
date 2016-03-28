@@ -140,3 +140,23 @@ def nonNegativeLessThan(n: Int): Rand[Int] =
 println("Rand less than 10: %s".format(
   nonNegativeLessThan(10)(rng2)
 ))
+
+// We can implement map & map2 using flatMap.
+def mapViaFlatMap [A, B] (action: Rand[A]) (f: A => B): Rand[B] =
+  flatMap(action)(a => unit(f(a)))
+
+def map2ViaFlatMap [A, B, C] (ra: Rand[A], rb: Rand[B])(f: (A, B) => C): Rand[C] =
+  flatMap(ra)(a => {
+    flatMap(rb)(b => {
+      unit(f(a, b))
+    })
+  })
+
+println("mapViaFlatMap: %s".format(
+  mapViaFlatMap(randInt)(_ % 100)(rng2)
+))
+
+println("map2ViaFlatMap: %s".format(
+  map2ViaFlatMap(randInt, randInt)
+  ((x, y) => (x % 100, y % 100))(rng2)
+))
