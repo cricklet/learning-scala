@@ -104,3 +104,23 @@ def intDouble: Rand[(Int, Double)] =
   both(randInt, double)
 
 println("Int, double: %s".format(intDouble(rng2)))
+
+// Sometimes we want to perform lots of state actions, but want it to appear
+// as though we're only performing one state action. It's basically function
+// composition.
+def sequence [A] (actions: List[Rand[A]]): Rand[List[A]] =
+  actions match {
+    case f :: fs => map2(f, sequence(fs))(_::_)
+    case Nil => (rng => (Nil, rng))
+  }
+
+println("Sequence of randoms: %s".format(
+  sequence(List(randInt, positiveEven))(rng2)
+))
+
+def randomInts(n: Int): Rand[List[Int]] =
+  sequence(List.fill(n)(randInt))
+
+println("Sequence of random ints: %s".format(
+  randomInts(10)(rng2)
+))
