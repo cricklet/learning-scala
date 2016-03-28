@@ -84,3 +84,8 @@ def positiveEven: Rand[Int] =
   map(positiveInt)(i => i - i % 2)
 
 println("Positive even #: %s".format(positiveEven(rng2)))
+
+def doubleViaMap: Rand[Double] =
+  map(positiveInt)(i => i.toDouble / Int.MaxValue.toDouble)
+
+println("Double via map: %s".format(doubleViaMap(rng2)))
