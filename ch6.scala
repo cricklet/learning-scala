@@ -124,3 +124,19 @@ def randomInts(n: Int): Rand[List[Int]] =
 println("Sequence of random ints: %s".format(
   randomInts(10)(rng2)
 ))
+
+def flatMap[A, B](f: Rand[A])(g: A => Rand[B]): Rand[B] =
+  rng => {
+    val (a, rng2) = f(rng)
+    g(a)(rng2)
+  }
+
+def nonNegativeLessThan(n: Int): Rand[Int] =
+  flatMap(randInt)(x => {
+    if (Int.MaxValue - x < n) nonNegativeLessThan(n)
+    else unit(x % n)
+  })
+
+println("Rand less than 10: %s".format(
+  nonNegativeLessThan(10)(rng2)
+))
