@@ -89,3 +89,15 @@ def doubleViaMap: Rand[Double] =
   map(positiveInt)(i => i.toDouble / Int.MaxValue.toDouble)
 
 println("Double via map: %s".format(doubleViaMap(rng2)))
+
+def map2 [A, B, C] (ra: Rand[A], rb: Rand[B])(f: (A, B) => C): Rand[C] =
+  rng0 => {
+    val (a, rng1) = ra(rng0)
+    val (b, rng2) = rb(rng1)
+    (f(a, b), rng2)
+  }
+
+def intDouble: Rand[(Int, Double)] =
+  map2(randInt, double)((_,_))
+
+println("Int, double: %s".format(intDouble(rng2)))
