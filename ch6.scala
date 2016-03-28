@@ -97,7 +97,10 @@ def map2 [A, B, C] (ra: Rand[A], rb: Rand[B])(f: (A, B) => C): Rand[C] =
     (f(a, b), rng2)
   }
 
+def both [A, B](ra: Rand[A], rb: Rand[B]): Rand[(A, B)] =
+  map2(ra, rb)((_,_))
+
 def intDouble: Rand[(Int, Double)] =
-  map2(randInt, double)((_,_))
+  both(randInt, double)
 
 println("Int, double: %s".format(intDouble(rng2)))
