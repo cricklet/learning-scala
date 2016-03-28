@@ -1,4 +1,3 @@
-import State._
 
 // Traits are like interfaces from Java. They can be partially implemented
 // (i.e. like an abstract class)
@@ -67,12 +66,12 @@ println("Random int: %s".format(randInt(rng2)))
 // This will help us because we want to avoid explicitly passing along RNG
 // state! We kind of get a DSL that passes the state for us.
 
-// Consider the 'unit' action which passes the RNG state through without using
+// Consider the 'constRand' action which passes the RNG state through without using
 // it-- insteadl returning a constant.
-def unit [A] (a: A): Rand[A] =
+def constRand [A] (a: A): Rand[A] =
   rng => (a, rng)
 
-println("Unit of 1: %s".format(unit(1)(rng2)))
+println("constRand of 1: %s".format(constRand(1)(rng2)))
 
 // Sometimes we want to transform the output of a 'state action' without
 // modifying the state itself.
@@ -136,7 +135,7 @@ def flatMap[A, B](f: Rand[A])(g: A => Rand[B]): Rand[B] =
 def nonNegativeLessThan(n: Int): Rand[Int] =
   flatMap(randInt)(x => {
     if (Int.MaxValue - x < n) nonNegativeLessThan(n)
-    else unit(x % n)
+    else constRand(x % n)
   })
 
 println("Rand less than 10: %s".format(
@@ -145,12 +144,12 @@ println("Rand less than 10: %s".format(
 
 // We can implement map & map2 using flatMap.
 def mapViaFlatMap [A, B] (action: Rand[A]) (f: A => B): Rand[B] =
-  flatMap(action)(a => unit(f(a)))
+  flatMap(action)(a => constRand(f(a)))
 
 def map2ViaFlatMap [A, B, C] (ra: Rand[A], rb: Rand[B])(f: (A, B) => C): Rand[C] =
   flatMap(ra)(a => {
     flatMap(rb)(b => {
-      unit(f(a, b))
+      constRand(f(a, b))
     })
   })
 
@@ -166,6 +165,8 @@ println("map2ViaFlatMap: %s".format(
 // Our type 'Rand' can be generalized to any kind of 'State':
 // i.e. type State[S,+A] = S => (A,S)
 //      type Rand[A] = State[RNG, A]
+
+import State._
 
 case class State[S,+A](run: S => (A, S)) {
   def flatMap [B](g: A => State[S,B]): State[S,B] =
