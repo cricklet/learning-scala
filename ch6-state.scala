@@ -74,3 +74,42 @@ val l1: List[(Int, Int)] = List(0,1,2).flatMap(x =>
 
 println("Using a for-comprehension to combine two lists: %s".format(l0))
 println("Using a nested flatMaps + map to combine two lists: %s".format(l1))
+
+// Okay, so what was the point of writing 'modify', 'get', and 'set'?
+// 'get' clearly just returns the same state (while still being of type State)
+// 'set' sets the state (and completely clobbers the previous value)
+// 'modify'
+//   The only parameter is a function 'f' that transforms some state (S => S)
+//   We want to return a function of type State (i.e. S => (A, S)) where the
+//   state S returned is generated via 'f'.
+
+// Hmm 'get' and 'set' seem to make sense. 'modify' still doesn't...
+// Let's try unrolling it!
+
+def modifyViaNesting[S](f: S => S): State[S, Unit] =
+  State.get.flatMap(s =>
+    State.set(f(s)).map(_ => ()))
+
+// This returns a State[Int,Unit] s.t. whatever state (Int) is passed into it,
+// that state is incremented by 100.
+modifyViaNesting((x: Int) => x + 100)
+
+// For example:
+val count2: State[Int, Int] = for {
+  x0 <- counter
+  x1 <- counter
+  _  <- modifyViaNesting((x: Int) => x + 100)
+  x2 <- counter
+  x3 <- counter
+} yield x3
+
+val count3: State[Int, Int] = for {
+  x0 <- counter
+  x1 <- counter
+  _  <- State.modify((x: Int) => x + 100)
+  x2 <- counter
+  x3 <- counter
+} yield x3
+
+println("Modifying (w/ flatMap + map) the state within a for-comprehension: %s".format(count2.run(0)._1))
+println("Modifying (w/ comprehension) the state within a for-comprehension: %s".format(count3.run(0)._1))
