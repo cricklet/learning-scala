@@ -153,8 +153,26 @@ def simulateMachine(inputs: List[Input]): State[Machine, (Int, Int)] =
     m <- State.get
   } yield (m.coins, m.candies)
 
-val res1 = simulateMachine(List(Coin, Turn, Turn, Coin, Coin, Turn, Turn)).run(Machine(true, 5, 0))
-println("Simulate machine with 5 coins after 2 coin turns: %s".format(res1))
+def simulateMachineVerbose(inputs: List[Input]): State[Machine, (Int, Int)] =
+  inputs match {
+    case i :: is =>
+      for {
+        _ <- State.modify[Machine](_.input(i))
+        _ <- simulateMachineVerbose(is)
+        m <- State.get[Machine]
+      } yield (m.coins, m.candies)
+    case _ =>
+      for { m <- State.get }
+      yield (m.coins, m.candies)
+  }
+
+{
+  val res1 = simulateMachine(List(Coin, Turn, Turn, Coin, Coin, Turn, Turn)).run(Machine(true, 5, 0))
+  println("Simulate machine with 5 coins after 2 coin turns: %s".format(res1))
+
+  val res2 = simulateMachineVerbose(List(Coin, Turn, Turn, Coin, Coin, Turn, Turn)).run(Machine(true, 5, 0))
+  println("Simulate machine (verbose) with 5 coins after 2 coin turns: %s".format(res2))
+}
 
 // To understand this better, let's show what it looks like for a single action:
 val sim2: State[Machine, (Int,Int)] = for {
