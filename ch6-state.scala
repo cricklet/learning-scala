@@ -153,6 +153,8 @@ def simulateMachine(inputs: List[Input]): State[Machine, (Int, Int)] =
     m <- State.get
   } yield (m.coins, m.candies)
 
+// This way does suffer from one significant problem: it can't be tail call optimized...
+// Hmm...
 def simulateMachineVerbose(inputs: List[Input]): State[Machine, (Int, Int)] =
   inputs match {
     case i :: is =>
