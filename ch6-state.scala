@@ -25,6 +25,11 @@ object State {
   def unit [S,A] (a: A): State[S,A] =
     State(state => (a, state))
 
+  def sequence [S,A] (l: List[State[S,A]]): State[S,List[A]] =
+    l.foldRight(unit[S,List[A]](Nil))((next: State[S,A], prev: State[S,List[A]]) =>
+      next.map2(prev)(_ :: _)
+    )
+
   def modify [S](f: S => S): State[S, Unit] = for {
     s <- get
     _ <- set(f(s))
@@ -113,3 +118,48 @@ val count3: State[Int, Int] = for {
 
 println("Modifying (w/ flatMap + map) the state within a for-comprehension: %s".format(count2.run(0)._1))
 println("Modifying (w/ comprehension) the state within a for-comprehension: %s".format(count3.run(0)._1))
+
+// Alright, time to model a simple candy dispenser
+sealed trait Input
+case object Coin extends Input
+case object Turn extends Input
+
+case class Machine(locked: Boolean, candies: Int, coins: Int) {
+  def insertCoin (): Machine = this match {
+    case Machine(false, _, _) => this
+    case Machine(_, 0, _) => this
+    case Machine(true, _, _) => Machine(false, candies, coins + 1)
+  }
+  def turnKnob (): Machine = this match {
+    case Machine(true, _, _) => this
+    case Machine(_, 0, _) => this
+    case Machine(false, _, _) => Machine(true, candies - 1, coins)
+  }
+  def input (input: Input): Machine = input match {
+    case Coin => insertCoin()
+    case Turn => turnKnob()
+  }
+}
+
+// The rules are:
+//  - Inserting a coin into a locked machine will cause it to unlock if there is candy left
+//  - Turning the knob on an unlocked machine will cause it to dispense candy and become locked
+//  - Turning the knob on a locked machine or inserting a coin into an unlocked machine does nothing
+//  - A machine that's out of candy ignores all inputs
+
+def simulateMachine(inputs: List[Input]): State[Machine, (Int, Int)] =
+  for {
+    _ <- State.sequence(inputs.map((i: Input) => State.modify((m: Machine) => m.input(i))))
+    m <- State.get
+  } yield (m.coins, m.candies)
+
+val res1 = simulateMachine(List(Coin, Turn, Turn, Coin, Coin, Turn, Turn)).run(Machine(true, 5, 0))
+println("Simulate machine with 5 coins after 2 coin turns: %s".format(res1))
+
+// To understand this better, let's show what it looks like for a single action:
+val sim2: State[Machine, (Int,Int)] = for {
+  _ <- State.modify[Machine]((m: Machine) => m.input(Turn))
+  m <- State.get
+} yield (m.coins, m.candies)
+
+println("Simulate unlocked machine with 1 turn: %s".format(sim2.run(Machine(false, 1, 0))))
