@@ -52,3 +52,10 @@ def sum3 (ints: IndexedSeq[Int]): Int =
 //   def submit [A] (a: Callable[A]): Future[A]
 // }
 
+// Let's also think about what lazy evaluation implies for parallelization.
+// What happens when this is run?
+//    Par.get(Par.unit(sum(l))) + Par.get(Par.unit(sum(r)))
+
+// The first Par.get blocks while Par.unit(sum(l)) runs. This prevents Par.unit(sum(r))
+// from even starting!
+
