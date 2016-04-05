@@ -23,8 +23,8 @@ object Par {
   def lazyUnit [A] (a: => A): Par[A] =
     fork(unit(a))
 
-  // This extracts the result from a parallel computation.
-  def get [A] (a: Par[A]): A
+  // This runs a parallel computation, extracts the result
+  def run [A] (a: Par[A]): A
 
   // This let's you easily combine multiple computations
   def map2 [A, B, C] (a: Par[A], b: Par[B])(f: (A, B) => C): Par[C]
@@ -115,3 +115,18 @@ def sum5 (ints: IndexedSeq[Int]): Par[Int] =
       Par.fork(sum4(r))
     )(_ + _)
   }
+
+// So, let's think about who should handle running Par objects. Should we immediately
+// spawn a new thread when running fork(...)? Or should we wait till the result of
+// some Par object is requested (i.e. via get()) to start a new thread?
+
+// If fork(...) is to start the thread, then it has to know all about the global thread
+// pool, etc. This seems icky-- it seems likely that we'll want more fine-grained control
+// over how the threads get spawned.
+
+// In that case, we have to have something that runs a Par-- and that function is what
+// can decide how the threads get spawned. All fork(...) has to do is mark a Par object
+// for future concurrent evaluation.
+
+// Instead of get(), we want run().
+// Basically, it takes a Par and runs it somehow, possibly spawning new threads.
