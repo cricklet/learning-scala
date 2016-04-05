@@ -3,7 +3,7 @@ def sum1 (ints: Seq[Int]): Int =
   ints.foldLeft(0)(_+_)
 
 // Let's do it recursively in a way that could conceivably be parallelized:
-def sum2 (ints: Seq[Int]): Int =
+def sum2 (ints: IndexedSeq[Int]): Int =
   if (ints.size == 0) 0
   else if (ints.size == 1) ints.head
   else {
@@ -15,9 +15,22 @@ def sum2 (ints: Seq[Int]): Int =
 // We need to think of a dataa-type to represent our parallel computations.
 // Obviously, that data type must contain the result.
 
-// This takes an unevaluated expression and returns a computation that
-// evaluates it in a separate thread.
-def unit [A] (a: => A): Par[A]
+object Par {
+  // This takes an unevaluated expression and returns a computation that
+  // evaluates it in a separate thread.
+  def unit [A] (a: => A): Par[A]
 
-// This extracts the result from a parallel computation.
-def get[A] (a: Par[A]): A
+  // This extracts the result from a parallel computation.
+  def get[A] (a: Par[A]): A
+}
+
+// Here's how we woud write a parallelized sum given a 'Par' datatype.
+def sum3 (ints: IndexedSeq[Int]): Int =
+  if (ints.size == 0) 0
+  else if (ints.size == 1) ints.head
+  else {
+    val (l,r) = ints.splitAt(ints.length / 2)
+    val sumL: Par[Int] = Par.unit(sum3(l))
+    val sumR: Par[Int] = Par.unit(sum3(r))
+    Par.get(sumL) + Par.get(sumR)
+  }
