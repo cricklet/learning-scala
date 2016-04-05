@@ -21,7 +21,10 @@ object Par {
   def unit [A] (a: => A): Par[A]
 
   // This extracts the result from a parallel computation.
-  def get[A] (a: Par[A]): A
+  def get [A] (a: Par[A]): A
+
+  // This let's you easily combine multiple computations
+  def map2 [A, B, C] (a: Par[A], b: Par[B])(f: (A, B) => C): Par[C]
 }
 
 // Here's how we woud write a parallelized sum given a 'Par' datatype.
@@ -59,3 +62,31 @@ def sum3 (ints: IndexedSeq[Int]): Int =
 // The first Par.get blocks while Par.unit(sum(l)) runs. This prevents Par.unit(sum(r))
 // from even starting!
 
+// In this version of sum, we combine two Pars via Par.map2
+def sum4 (ints: IndexedSeq[Int]): Par[Int] =
+  if (ints.size == 0) Par.unit(0)
+  else if (ints.size == 1) Par.unit(ints.head)
+  else {
+    val (l,r) = ints.splitAt(ints.length / 2)
+    Par.map2(sum4(l), sum4(r))(_ + _)
+  }
+
+// What happens if map2 is strict in both of it's arguments?
+//   sum4(List(1,2,3,4))
+//   map2(sum4(List(1,2)), sum4(List(3,4)))(add)
+//   map2(map2(sum4(List(1)), sum4(List(2)))(add), sum4(List(3,4)))(add)
+//   map2(map2(unit(1), unit(2))(add), sum4(List(3,4)))(add)
+
+// At this point, unit(1) and unit(2) can begin processing.
+
+//   map2(map2(unit(1), unit(2))(add), map2(sum4(List(3)), sum4(List(4)))(add))(add)
+//   map2(map2(unit(1), unit(2))(add), map2(unit(3), unit(4))(add))(add)
+
+// Thus, unit(1) and unit(2) begin computing before the second half of the list is
+// even considered.
+
+// What if we still strictly evaluate each argument of map2 but wait for the entire
+// expression tree to be evaluated before starting the computations for each Par object?
+// Well, we're going to have a lot of Par objects. It'll be pretty heavy.
+
+// This is hard to reason about without actuall code...
