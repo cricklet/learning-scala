@@ -34,3 +34,21 @@ def sum3 (ints: IndexedSeq[Int]): Int =
     val sumR: Par[Int] = Par.unit(sum3(r))
     Par.get(sumL) + Par.get(sumR)
   }
+
+// What's wrong with Java's tools: Runnable & Thread?
+// Everything returns 'Unit'!
+
+// trait Runnable { def run: Unit }
+// class Thread (r: Runnable) {
+//   def start: Unit
+//   def join: Unit
+// }
+
+// What's wrong with Future & ExecutorService?
+// There's no way of composing futures and Future.get is blocking.
+
+// trait Future [A] { def get: A }
+// class ExecutorService {
+//   def submit [A] (a: Callable[A]): Future[A]
+// }
+
