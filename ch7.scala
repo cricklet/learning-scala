@@ -8,7 +8,7 @@ def sum2 (ints: Seq[Int]): Int =
   else if (ints.size == 1) ints.head
   else {
     val (l,r) = ints.splitAt(ints.length / 2)
-    sum(l) + sum(r)
+    sum2(l) + sum2(r)
   }
 
 // Let's think about parallel computations.
