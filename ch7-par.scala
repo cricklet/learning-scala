@@ -75,6 +75,19 @@ object Par {
   def sortPar(parList: Par[List[Int]]): Par[List[Int]] =
     map(parList)(_.sorted)
 
+  def sequence [A] (ps: List[Par[A]]): Par[List[A]] =
+    ps.foldRight(unit(Nil: List[A]))((aPar: Par[A], asPar: Par[List[A]]) =>
+      map2(aPar, asPar)(_ :: _)
+    )
+
+  // What if instead of mapping on a Par, we want to map over a list in parallel?
+  // Well, it's easy enough to map over the list, creating parallel computations
+  // for each element. However, we need 'sequence' to combine them.
+  def parMap [A, B] (as: List[A])(f: A => B): Par[List[B]] = {
+    val fs: List[Par[B]] = as.map(asyncF(f))
+    sequence(fs)
+  }
+
   // Extract a value from a Par by actually performing the computation
   // def run [A] (a: Par[A]): Future[A]
 }
