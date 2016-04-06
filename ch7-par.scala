@@ -68,6 +68,13 @@ object Par {
   def asyncF [A,B] (f: A => B): A => Par[B] =
     (a: A) => lazyUnit(f(a))
 
+  def map [A, B] (a: Par[A])(f: A => B): Par[B] =
+    map2(a, unit(()))((a, _) => f(a))
+
+  // To implement this, we really want 'map'
+  def sortPar(parList: Par[List[Int]]): Par[List[Int]] =
+    map(parList)(_.sorted)
+
   // Extract a value from a Par by actually performing the computation
   // def run [A] (a: Par[A]): Future[A]
 }
