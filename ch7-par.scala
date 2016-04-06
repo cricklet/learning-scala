@@ -65,6 +65,9 @@ object Par {
   def lazyUnit [A] (a: => A): Par[A] =
     fork(unit(a))
 
+  def asyncF [A,B] (f: A => B): A => Par[B] =
+    (a: A) => lazyUnit(f(a))
+
   // Extract a value from a Par by actually performing the computation
   // def run [A] (a: Par[A]): Future[A]
 }
