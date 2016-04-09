@@ -88,6 +88,14 @@ object Par {
     sequence(fs)
   }
 
+  def parFilter [A] (as: List[A])(f: A => Boolean): Par[List[A]] = {
+    val fs: Par[List[Boolean]] = sequence(as.map(asyncF(a => f(a))))
+    map(fs)(
+      (bs: List[Boolean]) =>
+      as.zip(bs).filter(_._2).map(_._1)
+    )
+  }
+
   // Extract a value from a Par by actually performing the computation
   // def run [A] (a: Par[A]): Future[A]
 }
