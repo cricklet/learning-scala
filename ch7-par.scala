@@ -96,3 +96,15 @@ object Par {
   // Extract a value from a Par by actually performing the computation
   // def run [A] (a: Par[A]): Future[A]
 }
+
+
+// Let's try summing something in parallel
+def sum (as: List[Int]): Par[Int] = {
+  if (as.length == 0) Par.unit(0)
+  else if (as.length == 1) Par.unit(as.head)
+  else {
+    val (l, r) = as.splitAt(as.length / 2)
+    val (parL, parR) = (parSum(l), parSum(r))
+    Par.map2(parL, parR)(_ + _)
+  }
+}
