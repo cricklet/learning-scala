@@ -25,9 +25,7 @@ object Nonblocking {
     def fork[A](p: => Par[A]): Par[A] =
       (es: ExecutorService) => new Future[A] {
         def apply(cb: A => Unit): Unit =
-          eval(es)(
-            p(es) { a => cb(a) }
-          )
+          eval(es)(p(es)(cb))
       }
 
     def run[A](es: ExecutorService)(p: Par[A]): A = {
