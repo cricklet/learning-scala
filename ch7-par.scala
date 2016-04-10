@@ -94,7 +94,8 @@ object Par {
   }
 
   // Extract a value from a Par by actually performing the computation
-  // def run [A] (a: Par[A]): Future[A]
+  def run [A] (es: ExecutorService)(a: Par[A]): Future[A] =
+    a(es)
 }
 
 
