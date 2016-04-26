@@ -37,3 +37,8 @@ Thread.sleep(1000)
 def choiceMap [K,V] (pKey: Par[K]) (pChoices: Map[K, Par[V]]): Par[V] = {
   Par.flatMap(pKey)(pChoices(_))
 }
+
+// Just choose already
+def choice [K,V] (pKey: Par[K]) (choose: K => Par[V]): Par[V] = {
+  Par.flatMap(pKey)(choose(_))
+}
