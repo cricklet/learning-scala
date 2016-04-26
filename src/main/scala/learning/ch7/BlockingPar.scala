@@ -48,11 +48,14 @@ object Blocking {
     def map[A, B](a: Par[A])(f: A => B): Par[B] =
       map2(a, unit(()))((a, _) => f(a))
 
-    def flatMap[A, B](pA: Par[A])(f: A => Par[B]): Par[B] =
+    def join[A] (pP: Par[Par[A]]): Par[A] =
       (e: ExecutorService) => {
-        val a = run(e)(pA).get
-        run(e)(f(a))
+        val p = run(e)(pP).get
+        run(e)(p)
       }
+
+    def flatMap[A, B](pA: Par[A])(f: A => Par[B]): Par[B] =
+      join(map(pA)(f))
 
     // To implement this, we really want 'map'
     def sortPar(parList: Par[List[Int]]): Par[List[Int]] =
