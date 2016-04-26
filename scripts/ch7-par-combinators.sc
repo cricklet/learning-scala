@@ -32,3 +32,8 @@ def choice [A] (pCond: Par[Boolean])(pYes: Par[A], pNo: Par[A]): Par[A] = {
 val pYes = choice(Par.unit(true))(Par.unit("yes"), Par.unit("no"))
 Par.run(es)(Par.map(pYes)(println))
 Thread.sleep(1000)
+
+// Map to Pars
+def choiceMap [K,V] (pKey: Par[K]) (pChoices: Map[K, Par[V]]): Par[V] = {
+  Par.flatMap(pKey)(pChoices(_))
+}
