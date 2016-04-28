@@ -4,11 +4,9 @@
 
 // There are laws/properties that describe these functions.
 // We can test these properties using property based testing!
-
 def sum (l: List[Int]): Int =
   if (l.length == 0) 0
   else l.head + sum(l.tail)
-
 sum(List(1,2,3))
 
 // Here's some properties that should hold for sum:
@@ -32,4 +30,8 @@ sum(List(1,2,3))
 // framework can do stuff like:
 //   - Find the smallest example s.t. the test fails.
 //   - Exhaustively test all possibilities.
-
+import learning.ch8.PropertyTesting.{Gen}
+import learning.ch6.{SimpleRNG}
+val rng = SimpleRNG(12345)
+val gen = Gen.choose(0, 100)
+gen.sample.run(rng)
