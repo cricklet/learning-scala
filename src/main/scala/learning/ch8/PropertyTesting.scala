@@ -19,6 +19,9 @@ object PropertyTesting {
         f(_).sample
       ))
     }
+    def listOfN(n: Int): Gen[List[A]] =
+      Gen[List[A]](State.sequence(
+        List.fill(n)(this.sample)))
   }
   object Gen {
     // def listOf[A](gen: Gen[A]): Gen[List[A]]
@@ -36,12 +39,18 @@ object PropertyTesting {
       Gen[Boolean](State[RNG,Boolean](RNG.boolean))
 
     def listOfN[A](n: Int, g: Gen[A]): Gen[List[A]] =
-      Gen[List[A]](
-        State.sequence(
-          List.fill(n)(
-            State[RNG,A](g.sample.run)
-          )
-        )
-      )
+      g.listOfN(n)
+
+    def union[A](g1: Gen[A], g2: Gen[A]): Gen[A] =
+      Gen[A](State(RNG.boolean).flatMap(
+        b => if (b) g1.sample else g2.sample
+      ))
+
+    def weighted[A](g1: Gen[A], w1: Double, g2: Gen[A], w2: Double): Gen[A] = {
+      val threshold = w1.abs / (w1.abs + w2.abs)
+      Gen[A](State(RNG.double).flatMap(
+        d => if (d < threshold) g1.sample else g2.sample
+      ))
+    }
   }
 }

@@ -61,4 +61,9 @@ object RNG {
     (((n % 2) == 0), rng1)
   }
 
+  def double(rng0: RNG): (Double, RNG) = {
+    val (n, rng1) = nonNegativeInt(rng0)
+    (n / (Int.MaxValue.toDouble + 1), rng1)
+  }
+
 }
