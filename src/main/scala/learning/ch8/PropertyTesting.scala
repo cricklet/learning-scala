@@ -10,7 +10,21 @@ object PropertyTesting {
     def check(): Boolean
   }
 
-  case class Gen[A](sample: State[RNG, A])
+  case class Gen[A](sample: State[RNG, A]) {
+    def map[B](f: A => B): Gen[B] = {
+      Gen[B](State[RNG,B](rng0 => {
+        val (a, rng1) = this.sample.run(rng0)
+        (f(a), rng1)
+      }))
+    }
+    def flatMap[B](f: A => Gen[B]): Gen[B] = {
+      Gen[B](State[RNG,B](rng0 => {
+        val (a, rng1) = this.sample.run(rng0)
+        val (b, rng2) = f(a).sample.run(rng1)
+        (b, rng2)
+      }))
+    }
+  }
   object Gen {
     // def listOf[A](gen: Gen[A]): Gen[List[A]]
     // def forAll[A](gen: Gen[A])(f: A => Boolean): Boolean

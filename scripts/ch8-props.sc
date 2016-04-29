@@ -48,3 +48,29 @@ randState.run(rng)
 
 val genList = Gen.listOfN(10, gen)
 genList.sample.run(rng)
+
+// Let's try generating (Int, Int)
+// Hmmm... It's easy to make a list of length 2.
+// But how would we make a pair?
+val genList2 = Gen.listOfN(2, Gen.choose(0, 100))
+val genPair = Gen(State[RNG, (Int, Int)](
+  rng0 => {
+    val (x, rng1) = Gen.choose(0, 100).sample.run(rng0)
+    val (y, rng2) = Gen.choose(0, 100).sample.run(rng1)
+    ((x, y), rng2)
+  }
+))
+
+genList2.sample.run(rng)
+genPair.sample.run(rng)
+
+// Let's try producing Gen[Option[A]] from a Gen[A]
+val genOpt = Gen(State[RNG, Option[Int]](
+  rng0 => {
+    val (n, rng1) = gen.sample.run(rng0)
+    (Some(n), rng1)
+  }
+))
+genOpt.sample.run(rng)
+
+// This all feels very awkward. We need `flatMap`!
