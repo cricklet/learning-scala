@@ -18,9 +18,29 @@ object PropertyTesting {
       Gen[Int](State[RNG,Int](
         rng => {
           val (n, rng1) = rng.nextInt
-          ((n % (high - low) + low), rng1)
+          ((Math.abs(n) % (high - low) + low), rng1)
         }
       ))
     }
+
+    def unit[A](a: => A): Gen[A] =
+      Gen[A](State[RNG,A](rng => (a, rng)))
+
+    def boolean(): Gen[Boolean] =
+      Gen[Boolean](State[RNG,Boolean](rng => {
+        val (n, rng1) = rng.nextInt
+        (n % 2 == 0, rng)
+      }))
+
+    def listOfN[A](n: Int, g: Gen[A]): Gen[List[A]] =
+      Gen[List[A]](
+        State.sequence(
+          List.fill(n)(
+            State[RNG,A](rng => {
+              g.sample.run(rng)
+            })
+          )
+        )
+      )
   }
 }
