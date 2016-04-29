@@ -34,9 +34,9 @@ sum(List(1,2,3))
 //   - Exhaustively test all possibilities.
 
 import learning.ch8.PropertyTesting.{Gen}
-import learning.ch6.{SimpleRNG,RNG,State}
+import learning.ch6.{RNG,State}
 
-val rng = SimpleRNG(12345)
+val rng = RNG.Simple(12345)
 val gen = Gen.choose(0, 100)
 gen.sample.run(rng)
 
